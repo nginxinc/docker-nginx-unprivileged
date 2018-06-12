@@ -4,3 +4,4 @@ This Dockerfile creates an NGINX Docker image that runs NGINX as a non root, unp
 * The default NGINX listen port is now `8080` instead of `80`
 * The default NGINX user directive in `/etc/nginx/nginx.conf` has been removed
 * The default NGINX PID has been moved from `/var/run/nginx.pid` to `/var/cache/nginx/nginx.pid`
+* Change `*_temp_path` variables to `/var/cache/nginx/*`
