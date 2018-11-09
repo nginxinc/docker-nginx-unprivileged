@@ -90,7 +90,7 @@ RUN set -x \
 
 # implement changes required to run NGINX as an unprivileged user
 RUN usermod -u 1001 nginx \
-	chown -R 1001:0 /var/cache/nginx \
+	&& chown -R 1001:0 /var/cache/nginx \
 	&& chmod -R g+w /var/cache/nginx \
 	&& sed -i -e '/listen/!b' -e '/80;/!b' -e 's/80;/8080;/' /etc/nginx/conf.d/default.conf \
 	&& sed -i -e '/user/!b' -e '/nginx/!b' -e '/nginx/d' /etc/nginx/nginx.conf \
