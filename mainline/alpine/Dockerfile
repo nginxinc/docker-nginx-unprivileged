@@ -51,7 +51,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 		--with-http_v2_module \
 	" \
 	&& addgroup -S nginx \
-	&& adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx \
+	&& adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx --uid 1001 nginx \
 	&& apk add --no-cache --virtual .build-deps \
 		gcc \
 		libc-dev \
@@ -139,13 +139,12 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY nginx.vh.default.conf /etc/nginx/conf.d/default.conf
 
-RUN chown -R :0 /var/cache/nginx \
-	&& chmod -R g+w /var/cache/nginx
+RUN chown -R 1001:0 /var/cache/nginx
 
 EXPOSE 8080
 
 STOPSIGNAL SIGTERM
 
-USER root
+USER 1001
 
 CMD ["nginx", "-g", "daemon off;"]
