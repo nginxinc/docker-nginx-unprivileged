@@ -1,4 +1,5 @@
-FROM debian:stretch-slim
+ARG IMAGE=debian:stretch-slim
+FROM $IMAGE
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
