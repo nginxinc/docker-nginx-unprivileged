@@ -145,7 +145,8 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY nginx.vh.default.conf /etc/nginx/conf.d/default.conf
 
-RUN chown -R 1001:0 /var/cache/nginx
+RUN chown -R 1001:0 /var/cache/nginx \
+  && chmod -R g+w /var/cache/nginx
 
 EXPOSE 8080
 
