@@ -101,7 +101,7 @@ RUN sed -i -e '/listen/!b' -e '/80;/!b' -e 's/80;/8080;/' /etc/nginx/conf.d/defa
 
 # nginx user must own the cache directory to write cache
 RUN chown -R 101:0 /var/cache/nginx \
-	&& chmod -R g+w /var/cache/nginx
+    && chmod -R g+w /var/cache/nginx
 
 # forward request and error logs to docker log collector
 RUN ln -sf /dev/stdout /var/log/nginx/access.log \

@@ -6,4 +6,4 @@ This Dockerfile creates an NGINX Docker image that runs NGINX as a non root, unp
 *   The default NGINX PID has been moved from `/var/run/nginx.pid` to `/tmp/nginx.pid`.
 *   Change `*_temp_path` variables to `/tmp/*`.
 
-Docker Hub images are built for the `amd64`, `arm32v6` (for Alpine), `arm32v7` (for Debian), `i386` and `ppc64le` architectures and can be found at <https://hub.docker.com/r/nginxinc/nginx-unprivileged>.
+Docker Hub images are built for the `amd64`, `arm32v6` (for Alpine), `arm32v7` (for Debian), `i386`, `ppc64le` and `s390x` architectures and can be found at <https://hub.docker.com/r/nginxinc/nginx-unprivileged>.
