@@ -3,7 +3,7 @@ FROM $IMAGE
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
-ENV NGINX_VERSION   1.17.9
+ENV NGINX_VERSION   1.17.10
 ENV NJS_VERSION     0.3.9
 ENV PKG_RELEASE     1~buster
 
