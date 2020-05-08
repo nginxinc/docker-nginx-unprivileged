@@ -105,10 +105,7 @@ RUN set -x \
     && apk add --no-cache curl ca-certificates \
 # forward request and error logs to docker log collector
     && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log \
-# make default server listen on ipv6
-    && sed -i -E 's,listen       80;,listen       80;\n    listen  [::]:80;,' \
-        /etc/nginx/conf.d/default.conf
+    && ln -sf /dev/stderr /var/log/nginx/error.log
 
 # implement changes required to run NGINX as an unprivileged user
 RUN sed -i -e '/listen/!b' -e '/80;/!b' -e 's/80;/8080;/' /etc/nginx/conf.d/default.conf \

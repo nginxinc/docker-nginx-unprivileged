@@ -98,10 +98,6 @@ RUN set -x \
 RUN ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
-# make default server listen on ipv6
-RUN sed -i -E 's,listen       80;,listen       80;\n    listen  [::]:80;,' \
-        /etc/nginx/conf.d/default.conf
-
 # implement changes required to run NGINX as an unprivileged user
 RUN sed -i -e '/listen/!b' -e '/80;/!b' -e 's/80;/8080;/' /etc/nginx/conf.d/default.conf \
     && sed -i -e '/user/!b' -e '/nginx/!b' -e '/nginx/d' /etc/nginx/nginx.conf \
