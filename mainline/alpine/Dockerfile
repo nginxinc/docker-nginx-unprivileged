@@ -108,17 +108,21 @@ RUN set -x \
 # create a docker-entrypoint.d directory
     && mkdir /docker-entrypoint.d
 
-COPY docker-entrypoint.sh /
-COPY 10-listen-on-ipv6-by-default.sh /docker-entrypoint.d
-COPY 20-envsubst-on-templates.sh /docker-entrypoint.d
-COPY 30-configure-nginx-unprivileged.sh /docker-entrypoint.d
-ENTRYPOINT ["/docker-entrypoint.sh"]
-
+# implement changes required to run NGINX as an unprivileged user
+RUN sed -i 's,listen       80;,listen       8080;,' /etc/nginx/conf.d/default.conf \
+    && sed -i '/user  nginx;/d' /etc/nginx/nginx.conf \
+    && sed -i 's,/var/run/nginx.pid,/tmp/nginx.pid,' /etc/nginx/nginx.conf \
+    && sed -i "/^http {/a \    proxy_temp_path /tmp/proxy_temp;\n    client_body_temp_path /tmp/client_temp;\n    fastcgi_temp_path /tmp/fastcgi_temp;\n    uwsgi_temp_path /tmp/uwsgi_temp;\n    scgi_temp_path /tmp/scgi_temp;\n" /etc/nginx/nginx.conf \
 # nginx user must own the cache and etc directory to write cache and tweak the nginx config
-RUN chown -R 101:0 /var/cache/nginx \
+    && chown -R 101:0 /var/cache/nginx \
     && chmod -R g+w /var/cache/nginx \
     && chown -R 101:0 /etc/nginx \
     && chmod -R g+w /etc/nginx
+
+COPY docker-entrypoint.sh /
+COPY 10-listen-on-ipv6-by-default.sh /docker-entrypoint.d
+COPY 20-envsubst-on-templates.sh /docker-entrypoint.d
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 EXPOSE 8080
 
