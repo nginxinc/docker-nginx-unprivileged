@@ -34,14 +34,14 @@ echo "$ME: Getting the checksum of /$DEFAULT_CONF_FILE"
 
 case "$ID" in
     "debian")
-        CHECKSUM=$(dpkg-query --show --showformat='${Conffiles}\n' nginx | grep $DEFAULT_CONF_FILE | cut -d' ' -f 3)
+        CHECKSUM=488862ed8b1990eec63c08a94202521c
         echo "$CHECKSUM  /$DEFAULT_CONF_FILE" | md5sum -c - >/dev/null 2>&1 || {
             echo "$ME: /$DEFAULT_CONF_FILE differs from the packaged version, exiting" 1>&2
             exit 0
         }
         ;;
     "alpine")
-        CHECKSUM=$(apk manifest nginx 2>/dev/null| grep $DEFAULT_CONF_FILE | cut -d' ' -f 1 | cut -d ':' -f 2)
+        CHECKSUM=cc42360460835eec3cc900da9434a85733c9118b
         echo "$CHECKSUM  /$DEFAULT_CONF_FILE" | sha1sum -c - >/dev/null 2>&1 || {
             echo "$ME: /$DEFAULT_CONF_FILE differs from the packages version, exiting" 1>&2
             exit 0
