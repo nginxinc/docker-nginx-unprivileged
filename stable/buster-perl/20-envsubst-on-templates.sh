@@ -13,7 +13,7 @@ auto_envsubst() {
   defined_envs=$(printf '${%s} ' $(env | cut -d= -f1))
   [ -d "$template_dir" ] || return 0
   if [ ! -w "$output_dir" ]; then
-    echo "$ME: ERROR: $template_dir exists, but $output_dir is not writable, exiting" 1>&2
+    echo "$ME: ERROR: $template_dir exists, but $output_dir is not writable" 1>&2
     return 0
   fi
   find "$template_dir" -follow -type f -name "*$suffix" -print | while read -r template; do
@@ -22,7 +22,7 @@ auto_envsubst() {
     subdir=$(dirname "$relative_path")
     # create a subdirectory where the template file exists
     mkdir -p "$output_dir/$subdir"
-    echo "$ME: Running envsubst on $template to $output_path"
+    echo >&3 "$ME: Running envsubst on $template to $output_path"
     envsubst "$defined_envs" < "$template" > "$output_path"
   done
 }
