@@ -1,4 +1,4 @@
-ARG IMAGE=alpine:3.11
+ARG IMAGE=alpine:3.12
 FROM $IMAGE
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
