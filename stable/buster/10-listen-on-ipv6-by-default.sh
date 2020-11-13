@@ -21,7 +21,7 @@ fi
 touch /$DEFAULT_CONF_FILE 2>/dev/null || { echo >&3 "$ME: error: can not modify /$DEFAULT_CONF_FILE (read-only file system?)"; exit 0; }
 
 # check if the file is already modified, e.g. on a container restart
-grep -q "listen  \[::]\:8080;" /$DEFAULT_CONF_FILE && { echo >&3 "$ME: error: IPv6 listen already enabled"; exit 0; }
+grep -q "listen  \[::]\:8080;" /$DEFAULT_CONF_FILE && { echo >&3 "$ME: info: IPv6 listen already enabled"; exit 0; }
 
 if [ -f "/etc/os-release" ]; then
     . /etc/os-release
@@ -36,14 +36,14 @@ case "$ID" in
     "debian")
         CHECKSUM=488862ed8b1990eec63c08a94202521c
         echo "$CHECKSUM  /$DEFAULT_CONF_FILE" | md5sum -c - >/dev/null 2>&1 || {
-            echo >&3 "$ME: error: /$DEFAULT_CONF_FILE differs from the packaged version"
+            echo >&3 "$ME: info: /$DEFAULT_CONF_FILE differs from the packaged version"
             exit 0
         }
         ;;
     "alpine")
         CHECKSUM=cc42360460835eec3cc900da9434a85733c9118b
         echo "$CHECKSUM  /$DEFAULT_CONF_FILE" | sha1sum -c - >/dev/null 2>&1 || {
-            echo >&3 "$ME: error: /$DEFAULT_CONF_FILE differs from the packaged version"
+            echo >&3 "$ME: info: /$DEFAULT_CONF_FILE differs from the packaged version"
             exit 0
         }
         ;;
