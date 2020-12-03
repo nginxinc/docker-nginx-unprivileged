@@ -1,16 +1,11 @@
-#
-# NOTE: THIS DOCKERFILE IS GENERATED VIA "update.sh"
-#
-# PLEASE DO NOT EDIT IT DIRECTLY.
-#
-ARG IMAGE=alpine:3.11
+ARG IMAGE=alpine:%%ALPINE_VERSION%%
 FROM $IMAGE
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
-ENV NGINX_VERSION 1.18.0
-ENV NJS_VERSION   0.4.4
-ENV PKG_RELEASE   2
+ENV NGINX_VERSION %%NGINX_VERSION%%
+ENV NJS_VERSION   %%NJS_VERSION%%
+ENV PKG_RELEASE   %%PKG_RELEASE%%
 
 ARG UID=101
 ARG GID=101
@@ -20,12 +15,7 @@ RUN set -x \
     && addgroup -g $GID -S nginx \
     && adduser -S -D -H -u $UID -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
     && apkArch="$(cat /etc/apk/arch)" \
-    && nginxPackages=" \
-        nginx=${NGINX_VERSION}-r${PKG_RELEASE} \
-        nginx-module-xslt=${NGINX_VERSION}-r${PKG_RELEASE} \
-        nginx-module-geoip=${NGINX_VERSION}-r${PKG_RELEASE} \
-        nginx-module-image-filter=${NGINX_VERSION}-r${PKG_RELEASE} \
-        nginx-module-njs=${NGINX_VERSION}.${NJS_VERSION}-r${PKG_RELEASE} \
+    && nginxPackages="%%PACKAGES%%
     " \
     && case "$apkArch" in \
         x86_64) \
@@ -43,7 +33,7 @@ RUN set -x \
                 exit 1; \
             fi \
             && apk del .cert-deps \
-            && apk add -X "https://nginx.org/packages/alpine/v$(egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release)/main" --no-cache $nginxPackages \
+            && apk add -X "%%PACKAGEREPO%%v$(egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release)/main" --no-cache $nginxPackages \
             ;; \
         *) \
 # we're on an architecture upstream doesn't officially build for
@@ -73,7 +63,7 @@ RUN set -x \
                 && cd ${tempDir} \
                 && hg clone https://hg.nginx.org/pkg-oss \
                 && cd pkg-oss \
-                && hg up ${NGINX_VERSION}-${PKG_RELEASE} \
+                && hg up %%REVISION%% \
                 && cd alpine \
                 && make all \
                 && apk index -o ${tempDir}/packages/alpine/${apkArch}/APKINDEX.tar.gz ${tempDir}/packages/alpine/${apkArch}/*.apk \
