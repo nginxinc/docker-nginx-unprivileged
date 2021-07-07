@@ -8,6 +8,9 @@ FROM $IMAGE
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
+RUN apk update \
+    && apk upgrade
+
 ENV NGINX_VERSION 1.20.1
 ENV NJS_VERSION   0.5.3
 ENV PKG_RELEASE   1
