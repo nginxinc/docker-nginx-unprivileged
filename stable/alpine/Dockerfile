@@ -8,9 +8,6 @@ FROM $IMAGE
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
-RUN apk update \
-    && apk upgrade
-
 ENV NGINX_VERSION 1.20.1
 ENV NJS_VERSION   0.5.3
 ENV PKG_RELEASE   1
@@ -129,6 +126,9 @@ RUN sed -i 's,listen       80;,listen       8080;,' /etc/nginx/conf.d/default.co
     && chmod -R g+w /var/cache/nginx \
     && chown -R $UID:0 /etc/nginx \
     && chmod -R g+w /etc/nginx
+
+RUN apk update \
+    && apk upgrade
 
 COPY docker-entrypoint.sh /
 COPY 10-listen-on-ipv6-by-default.sh /docker-entrypoint.d
