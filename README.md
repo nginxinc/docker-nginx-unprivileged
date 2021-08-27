@@ -7,3 +7,5 @@ This Dockerfile creates an NGINX Docker image that runs NGINX as a non root, unp
 *   Change `*_temp_path` variables to `/tmp/*`.
 
 Docker Hub images are built for the `amd64`, `arm32v5` (for Debian), `arm32v6` (for Alpine), `arm32v7`, `arm64v8`, `i386`, `mips64le` (for Debian), `ppc64le` and `s390x` architectures and can be found at <https://hub.docker.com/r/nginxinc/nginx-unprivileged>.
+
+Warning: The latest mainline release, `1.21.1`, does not have an Alpine `i386` arch image due to an upstream `mercurial` bug.
