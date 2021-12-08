@@ -17,8 +17,8 @@ ARG GID=101
 
 RUN set -x \
 # create nginx user/group first, to be consistent throughout docker variants
-    && addgroup -g $GID -S nginx \
-    && adduser -S -D -H -u $UID -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+    && addgroup -g $GID -S nginx || true \
+    && adduser -S -D -H -u $UID -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx || true \
     && apkArch="$(cat /etc/apk/arch)" \
     && nginxPackages=" \
         nginx=${NGINX_VERSION}-r${PKG_RELEASE} \
