@@ -5,8 +5,8 @@ name: build
     branches:
       - main
   push:
-    branches:
-      - main
+    # branches:
+    #   - main
   workflow_dispatch:
 jobs:
   docker:
