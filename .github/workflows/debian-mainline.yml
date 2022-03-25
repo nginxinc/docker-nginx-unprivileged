@@ -1,0 +1,61 @@
+---
+name: Debian Mainline
+"on":
+  workflow_dispatch:
+jobs:
+  core:
+    name: Build Debian NGINX mainline Docker image
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Parse NGINX mainline version
+        id: version
+        run: |
+          echo "::set-output name=major::$(cat mainline/debian/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')"
+          echo "::set-output name=minor::$(cat mainline/debian/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')"
+          echo "::set-output name=patch::$(cat mainline/debian/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')"
+      - name: Build and push NGINX mainline Debian image
+        uses: docker/build-push-action@v2
+        with:
+          platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/mips64le, linux/ppc64le, linux/s390x
+          context: "{{ defaultContext }}:mainline/debian"
+          tags: nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}, nginxinc/nginx-unprivileged:mainline, nginxinc/nginx-unprivileged:1, nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}, nginxinc/nginx-unprivileged:latest
+          push: false
+  perl:
+    name: Build Debian perl NGINX mainline Docker image
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Parse NGINX mainline version
+        id: version
+        run: |
+          echo "::set-output name=major::$(cat mainline/debian-perl/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')"
+          echo "::set-output name=minor::$(cat mainline/debian-perl/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')"
+          echo "::set-output name=patch::$(cat mainline/debian-perl/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')"
+      - name: Build and push NGINX mainline perl Debian image
+        uses: docker/build-push-action@v2
+        with:
+          platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/mips64le, linux/ppc64le, linux/s390x
+          context: "{{ defaultContext }}:mainline/debian-perl"
+          tags: nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-perl, nginxinc/nginx-unprivileged:mainline-perl, nginxinc/nginx-unprivileged:1-perl, nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-perl, nginxinc/nginx-unprivileged:perl
+          push: false
