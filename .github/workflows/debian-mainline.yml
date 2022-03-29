@@ -2,7 +2,7 @@
 name: Debian Mainline
 on:
   schedule:
-    - cron: "0 0 * * 6"
+    - cron: "0 0 * * 2"
   workflow_dispatch:
 jobs:
   core:
@@ -40,7 +40,7 @@ jobs:
           push: true
 
   perl:
-    name: Build Debian perl NGINX mainline Docker image
+    name: Build Debian NGINX mainline perl Docker image
     runs-on: ubuntu-20.04
     steps:
       - name: Check out the codebase
