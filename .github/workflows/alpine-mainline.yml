@@ -8,18 +8,20 @@ jobs:
   core:
     name: Build Alpine NGINX mainline Docker image
     runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v3
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -32,7 +34,7 @@ jobs:
           echo "::set-output name=patch::$(cat mainline/alpine/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')"
 
       - name: Build and push NGINX mainline Alpine image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine"
@@ -42,18 +44,20 @@ jobs:
   perl:
     name: Build Alpine NGINX mainline perl Docker image
     runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v3
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -66,7 +70,7 @@ jobs:
           echo "::set-output name=patch::$(cat mainline/alpine-perl/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')"
 
       - name: Build and push NGINX mainline perl Alpine image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-perl"

@@ -3,13 +3,13 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-ARG IMAGE=alpine:3.15
+ARG IMAGE=alpine:3.16
 FROM $IMAGE
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
-ENV NGINX_VERSION 1.21.6
-ENV NJS_VERSION   0.7.2
+ENV NGINX_VERSION 1.23.1
+ENV NJS_VERSION   0.7.6
 ENV PKG_RELEASE   1
 
 ARG UID=101
@@ -72,7 +72,7 @@ RUN set -x \
                 export HOME=${tempDir} \
                 && cd ${tempDir} \
                 && curl -f -O https://hg.nginx.org/pkg-oss/archive/${NGINX_VERSION}-${PKG_RELEASE}.tar.gz \
-                && PKGOSSCHECKSUM=\"29ec1c635da36b7727953544e1a20e9d75bd9d2050e063b9f81f88ca07bb7ea0b65cef46d0f3cb7134b38ce9b94ecada631619f233231845a3d8a16b6ad0db82 *${NGINX_VERSION}-${PKG_RELEASE}.tar.gz\" \
+                && PKGOSSCHECKSUM=\"513952f1e0432e667a8e3afef791a2daa036911f35573c849712747f10418f3f5b8712faf75fcb87f91bfaf593622b1e1c4f38ad9fef830f4cae141357206ecd *${NGINX_VERSION}-${PKG_RELEASE}.tar.gz\" \
                 && if [ \"\$(openssl sha512 -r ${NGINX_VERSION}-${PKG_RELEASE}.tar.gz)\" = \"\$PKGOSSCHECKSUM\" ]; then \
                     echo \"pkg-oss tarball checksum verification succeeded!\"; \
                 else \
