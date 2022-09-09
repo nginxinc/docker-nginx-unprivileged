@@ -76,3 +76,39 @@ jobs:
           context: "{{ defaultContext }}:stable/alpine-perl"
           tags: nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-alpine-perl, nginxinc/nginx-unprivileged:stable-alpine-perl, nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-alpine-perl
           push: true
+
+  slim:
+    name: Build Alpine NGINX stable slim Docker image
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Parse NGINX stable version
+        id: version
+        run: |
+          echo "::set-output name=major::$(cat stable/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')"
+          echo "::set-output name=minor::$(cat stable/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')"
+          echo "::set-output name=patch::$(cat stable/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')"
+
+      - name: Build and push NGINX stable slim Alpine image
+        uses: docker/build-push-action@v3
+        with:
+          platforms: linux/amd64, linux/arm64
+          context: "{{ defaultContext }}:stable/alpine-slim"
+          tags: nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-alpine-slim, nginxinc/nginx-unprivileged:stable-alpine-slim, nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-alpine-slim
+          push: true

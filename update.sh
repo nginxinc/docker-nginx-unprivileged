@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 shopt -s nullglob
 
-cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
+cd "$(dirname "$(greadlink -f "$BASH_SOURCE")")"
 
 declare branches=(
     "stable"
@@ -82,16 +82,26 @@ get_packages() {
     esac
 
     echo -n ' \\\n'
-    for p in nginx nginx-module-xslt nginx-module-geoip nginx-module-image-filter $perl; do
-        echo -n '        '"$p"'=${NGINX_VERSION}-'"$r"'${PKG_RELEASE} \\\n'
-    done
-    for p in nginx-module-njs; do
-        echo -n '        '"$p"'=${NGINX_VERSION}'"$sep"'${NJS_VERSION}-'"$r"'${PKG_RELEASE} \\'
-    done
+    case "$distro" in
+    *-slim)
+        for p in nginx; do
+            echo -n '        '"$p"'=${NGINX_VERSION}-'"$r"'${PKG_RELEASE} \\'
+        done
+        ;;
+    *)
+        for p in nginx nginx-module-xslt nginx-module-geoip nginx-module-image-filter $perl; do
+            echo -n '        '"$p"'=${NGINX_VERSION}-'"$r"'${PKG_RELEASE} \\\n'
+        done
+        for p in nginx-module-njs; do
+            echo -n '        '"$p"'=${NGINX_VERSION}'"$sep"'${NJS_VERSION}-'"$r"'${PKG_RELEASE} \\'
+        done
+        ;;
+    esac
 }
 
 get_packagerepo() {
     local distro="${1%-perl}"
+    distro="${distro%-slim}"
     shift
     local branch="$1"
     shift
@@ -125,7 +135,7 @@ __EOF__
 
 for branch in "${branches[@]}"; do
     for variant in \
-        alpine{,-perl} \
+        alpine{,-perl,-slim} \
         debian{,-perl}; do
         echo "$branch: $variant"
         dir="$branch/$variant"
@@ -150,7 +160,7 @@ for branch in "${branches[@]}"; do
         packages=$(get_packages "$variant" "$branch")
         packagever=$(get_packagever "$variant" "$branch")
 
-        sed -i \
+        gsed -i \
             -e 's,%%ALPINE_VERSION%%,'"$alpinever"',' \
             -e 's,%%DEBIAN_VERSION%%,'"$debianver"',' \
             -e 's,%%NGINX_VERSION%%,'"$nginxver"',' \
