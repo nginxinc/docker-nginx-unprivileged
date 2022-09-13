@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 shopt -s nullglob
 
-cd "$(dirname "$(greadlink -f "$BASH_SOURCE")")"
+cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 declare branches=(
     "stable"
@@ -160,7 +160,7 @@ for branch in "${branches[@]}"; do
         packages=$(get_packages "$variant" "$branch")
         packagever=$(get_packagever "$variant" "$branch")
 
-        gsed -i \
+        sed -i \
             -e 's,%%ALPINE_VERSION%%,'"$alpinever"',' \
             -e 's,%%DEBIAN_VERSION%%,'"$debianver"',' \
             -e 's,%%NGINX_VERSION%%,'"$nginxver"',' \
