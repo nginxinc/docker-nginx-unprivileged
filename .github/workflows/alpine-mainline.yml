@@ -82,8 +82,6 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
-    env:
-      DOCKER_CONTENT_TRUST: 1
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v3
@@ -114,3 +112,5 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine-slim"
           tags: nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-alpine-slim, nginxinc/nginx-unprivileged:mainline-alpine-slim, nginxinc/nginx-unprivileged:1-alpine-slim, nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-alpine-slim, nginxinc/nginx-unprivileged:alpine-slim
           push: true
+        env:
+          DOCKER_CONTENT_TRUST: 1
