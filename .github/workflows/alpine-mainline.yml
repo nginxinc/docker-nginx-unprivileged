@@ -82,6 +82,8 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
+    env:
+      DOCKER_CONTENT_TRUST: 1
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v3
