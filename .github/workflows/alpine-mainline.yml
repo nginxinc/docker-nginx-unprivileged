@@ -108,7 +108,7 @@ jobs:
       - name: Setup Docker Content Trust signing key
         run: |
           mkdir -p ~/.docker/trust/private
-          echo ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }} > ~/.docker/trust/private/nginx.key
+          echo "${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}" > ~/.docker/trust/private/nginx.key
 
       - name: Build and push NGINX mainline slim Alpine image
         uses: docker/build-push-action@v3
