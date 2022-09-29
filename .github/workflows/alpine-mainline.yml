@@ -109,6 +109,7 @@ jobs:
         run: |
           mkdir -p ~/.docker/trust/private
           echo "$DOCKER_CONTENT_TRUST_REPOSITORY_KEY" > ~/.docker/trust/private/nginx.key
+          chmod 0400 ~/.docker/trust/private/nginx.key
           docker trust key load ~/.docker/trust/private/nginx.key --name nginx
         env:
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
