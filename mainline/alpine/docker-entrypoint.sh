@@ -18,11 +18,11 @@ if [ "$1" = "nginx" -o "$1" = "nginx-debug" ]; then
             case "$f" in
                 *.envsh)
                     if [ -x "$f" ]; then
-                        echo >&3 "$0: Sourcing $f";
+                        entrypoint_log "$0: Sourcing $f";
                         . "$f"
                     else
                         # warn on shell scripts without exec bit
-                        echo >&3 "$0: Ignoring $f, not executable";
+                        entrypoint_log "$0: Ignoring $f, not executable";
                     fi
                     ;;
                 *.sh)
