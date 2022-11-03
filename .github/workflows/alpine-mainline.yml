@@ -104,9 +104,6 @@ jobs:
           echo "major=$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')" >> $GITHUB_OUTPUT
           echo "minor=$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')" >> $GITHUB_OUTPUT
           echo "patch=$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')" >> $GITHUB_OUTPUT
-          # echo "::set-output name=major::$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')"
-          # echo "::set-output name=minor::$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')"
-          # echo "::set-output name=patch::$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')"
 
       - name: Setup Docker Content Trust signing key
         run: |
