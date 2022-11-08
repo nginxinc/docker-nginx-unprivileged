@@ -154,7 +154,7 @@ jobs:
         with:
           platforms: linux/amd64, linux/arm64
           context: "{{ defaultContext }}:mainline/alpine-slim"
-          tags: ${{ join(tags, ", ") }}
+          tags: ${{ join($tags, ", ") }}
           push: true
 
       - name: Sign Docker Manifest
