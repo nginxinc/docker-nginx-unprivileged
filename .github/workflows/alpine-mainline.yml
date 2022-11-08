@@ -19,9 +19,9 @@ jobs:
       - name: Parse NGINX mainline version
         id: version
         run: |
-          echo "major=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f1)" >> $GITHUB_OUTPUT
-          echo "minor=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f2)" >> $GITHUB_OUTPUT
-          echo "patch=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f3)" >> $GITHUB_OUTPUT
+          echo "major=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f1)" >> "$GITHUB_OUTPUT"
+          echo "minor=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f2)" >> "$GITHUB_OUTPUT"
+          echo "patch=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f3)" >> "$GITHUB_OUTPUT"
 
   # core:
   #   name: Build Alpine NGINX mainline Docker image
@@ -154,7 +154,7 @@ jobs:
         with:
           platforms: linux/amd64, linux/arm64
           context: "{{ defaultContext }}:mainline/alpine-slim"
-          tags: ${{ join($tags, ", ") }}
+          tags: "${{ join($tags, ', ') }}"
           push: true
 
       - name: Sign Docker Manifest
