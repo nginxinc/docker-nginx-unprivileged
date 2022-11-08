@@ -44,13 +44,6 @@ jobs:
   #         username: ${{ secrets.DOCKERHUB_USERNAME }}
   #         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  #     - name: Parse NGINX mainline version
-  #       id: version
-  #       run: |
-  #         echo "major=$(cat mainline/alpine/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')" >> $GITHUB_OUTPUT
-  #         echo "minor=$(cat mainline/alpine/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')" >> $GITHUB_OUTPUT
-  #         echo "patch=$(cat mainline/alpine/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')" >> $GITHUB_OUTPUT
-
   #     - name: Build and push NGINX mainline Alpine image
   #       uses: docker/build-push-action@v3
   #       with:
@@ -99,13 +92,6 @@ jobs:
   #         username: ${{ secrets.DOCKERHUB_USERNAME }}
   #         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  #     - name: Parse NGINX mainline version
-  #       id: version
-  #       run: |
-  #         echo "major=$(cat mainline/alpine-perl/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')" >> $GITHUB_OUTPUT
-  #         echo "minor=$(cat mainline/alpine-perl/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')" >> $GITHUB_OUTPUT
-  #         echo "patch=$(cat mainline/alpine-perl/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')" >> $GITHUB_OUTPUT
-
   #     - name: Build and push NGINX mainline perl Alpine image
   #       uses: docker/build-push-action@v3
   #       with:
@@ -139,6 +125,13 @@ jobs:
     strategy:
       fail-fast: false
     needs: version
+    env:
+      tags: ("nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim" "nginxinc/nginx-unprivileged:mainline-alpine-slim" "nginxinc/nginx-unprivileged:1-alpine-slim" "nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim" "nginxinc/nginx-unprivileged:alpine-slim")
+        # - "${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim"
+        # - "mainline-alpine-slim"
+        # - "1-alpine-slim"
+        # - "${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim"
+        # - "alpine-slim"
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v3
@@ -155,20 +148,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # - name: Parse NGINX mainline version
-      #   id: version
-      #   run: |
-      #     echo "major=$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')" >> $GITHUB_OUTPUT
-      #     echo "minor=$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')" >> $GITHUB_OUTPUT
-      #     echo "patch=$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')" >> $GITHUB_OUTPUT
-
       - name: Build and push NGINX mainline slim Alpine image
         id: build
         uses: docker/build-push-action@v3
         with:
           platforms: linux/amd64, linux/arm64
           context: "{{ defaultContext }}:mainline/alpine-slim"
-          tags: nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, nginxinc/nginx-unprivileged:mainline-alpine-slim, nginxinc/nginx-unprivileged:1-alpine-slim, nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, nginxinc/nginx-unprivileged:alpine-slim
+          tags: ${{ join(tags, ", ") }}
           push: true
 
       - name: Sign Docker Manifest
