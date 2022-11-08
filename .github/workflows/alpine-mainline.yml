@@ -5,9 +5,24 @@ on:
     - cron: "0 0 * * 1"
   workflow_dispatch:
 jobs:
+  version:
+    name: Fetch NGINX mainline version
+    runs-on: ubuntu-22.04
+    outputs:
+      major: ${{ steps.version.outputs.major }}
+      minor: ${{ steps.version.outputs.minor }}
+      patch: ${{ steps.version.outputs.patch }}
+    steps:
+      - name: Parse NGINX mainline version
+        id: version
+        run: |
+          echo "major=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f1)" >> $GITHUB_OUTPUT
+          echo "minor=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f2)" >> $GITHUB_OUTPUT
+          echo "patch=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f3)" >> $GITHUB_OUTPUT
+
   # core:
   #   name: Build Alpine NGINX mainline Docker image
-  #   runs-on: ubuntu-20.04
+  #   runs-on: ubuntu-22.04
   #   strategy:
   #     fail-fast: false
   #   steps:
@@ -29,9 +44,9 @@ jobs:
   #     - name: Parse NGINX mainline version
   #       id: version
   #       run: |
-  #         echo "::set-output name=major::$(cat mainline/alpine/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')"
-  #         echo "::set-output name=minor::$(cat mainline/alpine/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')"
-  #         echo "::set-output name=patch::$(cat mainline/alpine/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')"
+  #         echo "major=$(cat mainline/alpine/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')" >> $GITHUB_OUTPUT
+  #         echo "minor=$(cat mainline/alpine/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')" >> $GITHUB_OUTPUT
+  #         echo "patch=$(cat mainline/alpine/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')" >> $GITHUB_OUTPUT
 
   #     - name: Build and push NGINX mainline Alpine image
   #       uses: docker/build-push-action@v3
@@ -41,9 +56,28 @@ jobs:
   #         tags: nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-alpine, nginxinc/nginx-unprivileged:mainline-alpine, nginxinc/nginx-unprivileged:1-alpine, nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-alpine, nginxinc/nginx-unprivileged:alpine
   #         push: true
 
+  #     - name: Sign Docker Manifest
+  #       run: |
+  #         set -ex
+  #         sudo apt update
+  #         sudo apt install -y notary
+  #         mkdir -p ~/.docker/trust/private
+  #         echo "$DOCKER_CONTENT_TRUST_REPOSITORY_KEY" > ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
+  #         chmod 0400 ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
+  #         docker trust key load ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key --name nginx
+  #         DIGEST=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".digest' | cut -d ':' -f2)
+  #         SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
+  #         export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
+  #         notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged alpine $SIZE --sha256 $DIGEST --publish --verbose
+  #       env:
+  #         DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
+  #         DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
+  #         DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+  #         NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+
   # perl:
   #   name: Build Alpine NGINX mainline perl Docker image
-  #   runs-on: ubuntu-20.04
+  #   runs-on: ubuntu-22.04
   #   strategy:
   #     fail-fast: false
   #   steps:
@@ -65,9 +99,9 @@ jobs:
   #     - name: Parse NGINX mainline version
   #       id: version
   #       run: |
-  #         echo "::set-output name=major::$(cat mainline/alpine-perl/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')"
-  #         echo "::set-output name=minor::$(cat mainline/alpine-perl/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')"
-  #         echo "::set-output name=patch::$(cat mainline/alpine-perl/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')"
+  #         echo "major=$(cat mainline/alpine-perl/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')" >> $GITHUB_OUTPUT
+  #         echo "minor=$(cat mainline/alpine-perl/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')" >> $GITHUB_OUTPUT
+  #         echo "patch=$(cat mainline/alpine-perl/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')" >> $GITHUB_OUTPUT
 
   #     - name: Build and push NGINX mainline perl Alpine image
   #       uses: docker/build-push-action@v3
@@ -77,11 +111,31 @@ jobs:
   #         tags: nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-alpine-perl, nginxinc/nginx-unprivileged:mainline-alpine-perl, nginxinc/nginx-unprivileged:1-alpine-perl, nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-alpine-perl, nginxinc/nginx-unprivileged:alpine-perl
   #         push: true
 
+  #     - name: Sign Docker Manifest
+  #       run: |
+  #         set -ex
+  #         sudo apt update
+  #         sudo apt install -y notary
+  #         mkdir -p ~/.docker/trust/private
+  #         echo "$DOCKER_CONTENT_TRUST_REPOSITORY_KEY" > ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
+  #         chmod 0400 ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
+  #         docker trust key load ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key --name nginx
+  #         DIGEST=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".digest' | cut -d ':' -f2)
+  #         SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
+  #         export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
+  #         notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
+  #       env:
+  #         DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
+  #         DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
+  #         DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+  #         NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+
   slim:
     name: Build Alpine NGINX mainline slim Docker image
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
+    needs: version
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v3
@@ -98,23 +152,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Parse NGINX mainline version
-        id: version
-        run: |
-          echo "major=$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')" >> $GITHUB_OUTPUT
-          echo "minor=$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')" >> $GITHUB_OUTPUT
-          echo "patch=$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')" >> $GITHUB_OUTPUT
-
-      # - name: Setup Docker Content Trust signing key
+      # - name: Parse NGINX mainline version
+      #   id: version
       #   run: |
-      #     mkdir -p ~/.docker/trust/private
-      #     echo "$DOCKER_CONTENT_TRUST_REPOSITORY_KEY" > ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
-      #     chmod 0400 ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
-      #     docker trust key load ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key --name nginx
-      #   env:
-      #     DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
-      #     DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
-      #     DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+      #     echo "major=$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $1 }')" >> $GITHUB_OUTPUT
+      #     echo "minor=$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $2 }')" >> $GITHUB_OUTPUT
+      #     echo "patch=$(cat mainline/alpine-slim/Dockerfile | awk '$1 == "ENV" && $2 == "NGINX_VERSION" { print $3 }' |  awk -F. '{ print $3 }')" >> $GITHUB_OUTPUT
 
       - name: Build and push NGINX mainline slim Alpine image
         id: build
@@ -122,24 +165,29 @@ jobs:
         with:
           platforms: linux/amd64, linux/arm64
           context: "{{ defaultContext }}:mainline/alpine-slim"
-          tags: nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-alpine-slim, nginxinc/nginx-unprivileged:mainline-alpine-slim, nginxinc/nginx-unprivileged:1-alpine-slim, nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-alpine-slim, nginxinc/nginx-unprivileged:alpine-slim
+          tags: nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, nginxinc/nginx-unprivileged:mainline-alpine-slim, nginxinc/nginx-unprivileged:1-alpine-slim, nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, nginxinc/nginx-unprivileged:alpine-slim
           push: true
 
       - name: Sign Docker Manifest
         run: |
           set -ex
+          sudo apt update
+          sudo apt install -y notary
           mkdir -p ~/.docker/trust/private
           echo "$DOCKER_CONTENT_TRUST_REPOSITORY_KEY" > ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
           chmod 0400 ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
           docker trust key load ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key --name nginx
-          sudo apt update
-          sudo apt install -y notary
           DIGEST=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".digest' | cut -d ':' -f2)
           SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
           export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged mainline-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged 1-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
         env:
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
           DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
           NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+          # tags: []
