@@ -1,5 +1,5 @@
 ARG IMAGE=alpine:%%ALPINE_VERSION%%
-FROM alpine:%%ALPINE_VERSION%%
+FROM $IMAGE
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
