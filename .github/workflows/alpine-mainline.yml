@@ -23,101 +23,110 @@ jobs:
           echo "minor=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f2)" >> "$GITHUB_OUTPUT"
           echo "patch=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f3)" >> "$GITHUB_OUTPUT"
 
-  # core:
-  #   name: Build Alpine NGINX mainline Docker image
-  #   runs-on: ubuntu-22.04
-  #   strategy:
-  #     fail-fast: false
-  #   steps:
-  #     - name: Check out the codebase
-  #       uses: actions/checkout@v3
+  core:
+    name: Build Alpine NGINX mainline Docker image
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v3
 
-  #     - name: Set up QEMU
-  #       uses: docker/setup-qemu-action@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
 
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-  #     - name: Login to Docker Hub
-  #       uses: docker/login-action@v2
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  #     - name: Build and push NGINX mainline Alpine image
-  #       uses: docker/build-push-action@v3
-  #       with:
-  #         platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
-  #         context: "{{ defaultContext }}:mainline/alpine"
-  #         tags: nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-alpine, nginxinc/nginx-unprivileged:mainline-alpine, nginxinc/nginx-unprivileged:1-alpine, nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-alpine, nginxinc/nginx-unprivileged:alpine
-  #         push: true
+      - name: Build and push NGINX mainline Alpine image
+        uses: docker/build-push-action@v3
+        with:
+          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
+          context: "{{ defaultContext }}:mainline/alpine"
+          tags: nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-alpine, nginxinc/nginx-unprivileged:mainline-alpine, nginxinc/nginx-unprivileged:1-alpine, nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-alpine, nginxinc/nginx-unprivileged:alpine
+          push: true
 
-  #     - name: Sign Docker Manifest
-  #       run: |
-  #         set -ex
-  #         sudo apt update
-  #         sudo apt install -y notary
-  #         mkdir -p ~/.docker/trust/private
-  #         echo "$DOCKER_CONTENT_TRUST_REPOSITORY_KEY" > ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
-  #         chmod 0400 ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
-  #         docker trust key load ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key --name nginx
-  #         DIGEST=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".digest' | cut -d ':' -f2)
-  #         SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
-  #         export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
-  #         notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged alpine $SIZE --sha256 $DIGEST --publish --verbose
-  #       env:
-  #         DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
-  #         DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
-  #         DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
-  #         NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+      - name: Sign Docker Manifest
+        run: |
+          set -ex
+          sudo apt update
+          sudo apt install -y notary
+          mkdir -p ~/.docker/trust/private
+          echo "$DOCKER_CONTENT_TRUST_REPOSITORY_KEY" > ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
+          chmod 0400 ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
+          docker trust key load ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key --name nginx
+          DIGEST=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".digest' | cut -d ':' -f2)
+          SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
+          export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-alpine $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged mainline-alpine $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged 1-alpine $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-alpine $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged alpine $SIZE --sha256 $DIGEST --publish --verbose
+        env:
+          DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
+          DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
+          DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+          NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
 
-  # perl:
-  #   name: Build Alpine NGINX mainline perl Docker image
-  #   runs-on: ubuntu-22.04
-  #   strategy:
-  #     fail-fast: false
-  #   steps:
-  #     - name: Check out the codebase
-  #       uses: actions/checkout@v3
+  perl:
+    name: Build Alpine NGINX mainline perl Docker image
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+    needs: version
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v3
 
-  #     - name: Set up QEMU
-  #       uses: docker/setup-qemu-action@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
 
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-  #     - name: Login to Docker Hub
-  #       uses: docker/login-action@v2
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  #     - name: Build and push NGINX mainline perl Alpine image
-  #       uses: docker/build-push-action@v3
-  #       with:
-  #         platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
-  #         context: "{{ defaultContext }}:mainline/alpine-perl"
-  #         tags: nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-alpine-perl, nginxinc/nginx-unprivileged:mainline-alpine-perl, nginxinc/nginx-unprivileged:1-alpine-perl, nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-alpine-perl, nginxinc/nginx-unprivileged:alpine-perl
-  #         push: true
+      - name: Build and push NGINX mainline perl Alpine image
+        uses: docker/build-push-action@v3
+        with:
+          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
+          context: "{{ defaultContext }}:mainline/alpine-perl"
+          tags: nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-alpine-perl, nginxinc/nginx-unprivileged:mainline-alpine-perl, nginxinc/nginx-unprivileged:1-alpine-perl, nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-alpine-perl, nginxinc/nginx-unprivileged:alpine-perl
+          push: true
 
-  #     - name: Sign Docker Manifest
-  #       run: |
-  #         set -ex
-  #         sudo apt update
-  #         sudo apt install -y notary
-  #         mkdir -p ~/.docker/trust/private
-  #         echo "$DOCKER_CONTENT_TRUST_REPOSITORY_KEY" > ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
-  #         chmod 0400 ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
-  #         docker trust key load ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key --name nginx
-  #         DIGEST=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".digest' | cut -d ':' -f2)
-  #         SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
-  #         export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
-  #         notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
-  #       env:
-  #         DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
-  #         DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
-  #         DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
-  #         NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+      - name: Sign Docker Manifest
+        run: |
+          set -ex
+          sudo apt update
+          sudo apt install -y notary
+          mkdir -p ~/.docker/trust/private
+          echo "$DOCKER_CONTENT_TRUST_REPOSITORY_KEY" > ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
+          chmod 0400 ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
+          docker trust key load ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key --name nginx
+          DIGEST=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".digest' | cut -d ':' -f2)
+          SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
+          export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged mainline-alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged 1-alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
+        env:
+          DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
+          DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
+          DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+          NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
 
   slim:
     name: Build Alpine NGINX mainline slim Docker image
@@ -125,13 +134,6 @@ jobs:
     strategy:
       fail-fast: false
     needs: version
-    env:
-      tags: ("nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim" "nginxinc/nginx-unprivileged:mainline-alpine-slim" "nginxinc/nginx-unprivileged:1-alpine-slim" "nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim" "nginxinc/nginx-unprivileged:alpine-slim")
-        # - "${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim"
-        # - "mainline-alpine-slim"
-        # - "1-alpine-slim"
-        # - "${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim"
-        # - "alpine-slim"
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v3
@@ -154,7 +156,7 @@ jobs:
         with:
           platforms: linux/amd64, linux/arm64
           context: "{{ defaultContext }}:mainline/alpine-slim"
-          tags: ${{ join(env.tags, ', ') }}
+          tags: nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, nginxinc/nginx-unprivileged:mainline-alpine-slim, nginxinc/nginx-unprivileged:1-alpine-slim, nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, nginxinc/nginx-unprivileged:alpine-slim
           push: true
 
       - name: Sign Docker Manifest
@@ -179,4 +181,3 @@ jobs:
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
           DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
           NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
-          # tags: []
