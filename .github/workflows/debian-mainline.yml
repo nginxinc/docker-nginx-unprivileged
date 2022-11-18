@@ -105,7 +105,7 @@ jobs:
         with:
           platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/debian-perl"
-          tags: nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.${{ steps.version.outputs.patch }}-perl, nginxinc/nginx-unprivileged:mainline-perl, nginxinc/nginx-unprivileged:1-perl, nginxinc/nginx-unprivileged:${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}-perl, nginxinc/nginx-unprivileged:perl
+          tags: nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-perl, nginxinc/nginx-unprivileged:mainline-perl, nginxinc/nginx-unprivileged:1-perl, nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-perl, nginxinc/nginx-unprivileged:perl
           push: true
 
       - name: Sign Docker Manifest
