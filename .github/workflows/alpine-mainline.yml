@@ -52,7 +52,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push NGINX mainline Alpine image to Docker container registry
+      - name: Build and push NGINX mainline Alpine image to Docker Hub
         id: build
         uses: docker/build-push-action@v3
         with:
@@ -61,7 +61,7 @@ jobs:
           tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine, docker.io/nginxinc/nginx-unprivileged:mainline-alpine, docker.io/nginxinc/nginx-unprivileged:1-alpine, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine, docker.io/nginxinc/nginx-unprivileged:alpine
           push: true
 
-      - name: Build and push NGINX mainline Alpine image to GitHub container registry
+      - name: Build and push NGINX mainline Alpine image to GitHub Container Registry
         uses: docker/build-push-action@v3
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
@@ -69,7 +69,7 @@ jobs:
           tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine, ghcr.io/nginxinc/nginx-unprivileged:mainline-alpine, ghcr.io/nginxinc/nginx-unprivileged:1-alpine, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine, ghcr.io/nginxinc/nginx-unprivileged:alpine
           push: true
 
-      - name: Sign Docker Manifest
+      - name: Sign Docker Hub Manifest
         run: |
           set -ex
           sudo apt update
@@ -121,7 +121,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push NGINX mainline perl Alpine image to Docker container registry
+      - name: Build and push NGINX mainline perl Alpine image to Docker Hub
         id: build
         uses: docker/build-push-action@v3
         with:
@@ -130,7 +130,7 @@ jobs:
           tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-perl, docker.io/nginxinc/nginx-unprivileged:mainline-alpine-perl, docker.io/nginxinc/nginx-unprivileged:1-alpine-perl, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-perl, docker.io/nginxinc/nginx-unprivileged:alpine-perl
           push: true
 
-      - name: Build and push NGINX mainline perl Alpine image to GitHub container registry
+      - name: Build and push NGINX mainline perl Alpine image to GitHub Container Registry
         uses: docker/build-push-action@v3
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
@@ -138,7 +138,7 @@ jobs:
           tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-perl, ghcr.io/nginxinc/nginx-unprivileged:mainline-alpine-perl, ghcr.io/nginxinc/nginx-unprivileged:1-alpine-perl, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-perl, ghcr.io/nginxinc/nginx-unprivileged:alpine-perl
           push: true
 
-      - name: Sign Docker Manifest
+      - name: Sign Docker Hub Manifest
         run: |
           set -ex
           sudo apt update
@@ -190,7 +190,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push NGINX mainline slim Alpine image to Docker container registry
+      - name: Build and push NGINX mainline slim Alpine image to Docker Hub
         id: build
         uses: docker/build-push-action@v3
         with:
@@ -199,7 +199,7 @@ jobs:
           tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, docker.io/nginxinc/nginx-unprivileged:mainline-alpine-slim, docker.io/nginxinc/nginx-unprivileged:1-alpine-slim, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, docker.io/nginxinc/nginx-unprivileged:alpine-slim
           push: true
 
-      - name: Build and push NGINX mainline slim Alpine image to GitHub container registry
+      - name: Build and push NGINX mainline slim Alpine image to GitHub Container Registry
         uses: docker/build-push-action@v3
         with:
           platforms: linux/amd64, linux/arm64
@@ -207,7 +207,7 @@ jobs:
           tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:mainline-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:1-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:alpine-slim
           push: true
 
-      - name: Sign Docker Manifest
+      - name: Sign Docker Hub Manifest
         run: |
           set -ex
           sudo apt update
