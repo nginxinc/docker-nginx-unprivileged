@@ -60,6 +60,8 @@ jobs:
           context: "{{ defaultContext }}:stable/debian"
           tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}, docker.io/nginxinc/nginx-unprivileged:stable, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}
           push: true
+          cache-from: type=gha,scope=stable-debian
+          cache-to: type=gha,mode=max,scope=stable-debian
 
       - name: Build and push NGINX stable Debian image to GitHub Container Registry
         uses: docker/build-push-action@v3
@@ -68,6 +70,8 @@ jobs:
           context: "{{ defaultContext }}:stable/debian"
           tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}, ghcr.io/nginxinc/nginx-unprivileged:stable, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}
           push: true
+          cache-from: type=gha,scope=stable-debian
+          cache-to: type=gha,mode=max,scope=stable-debian
 
       - name: Sign Docker Hub Manifest
         run: |
@@ -127,6 +131,8 @@ jobs:
           context: "{{ defaultContext }}:mainline/debian-perl"
           tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-perl, docker.io/nginxinc/nginx-unprivileged:stable-perl, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-perl
           push: true
+          cache-from: type=gha,scope=stable-debian-perl
+          cache-to: type=gha,mode=max,scope=stable-debian-perl
 
       - name: Build and push NGINX stable perl Debian image to GitHub Container Registry
         uses: docker/build-push-action@v3
@@ -135,6 +141,8 @@ jobs:
           context: "{{ defaultContext }}:mainline/debian-perl"
           tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-perl, ghcr.io/nginxinc/nginx-unprivileged:stable-perl, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-perl
           push: true
+          cache-from: type=gha,scope=stable-debian-perl
+          cache-to: type=gha,mode=max,scope=stable-debian-perl
 
       - name: Sign Docker Hub Manifest
         run: |
