@@ -45,16 +45,31 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push NGINX stable Debian image
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push NGINX stable Debian image to Docker Hub
         id: build
         uses: docker/build-push-action@v3
         with:
           platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/mips64le, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:stable/debian"
-          tags: nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}, nginxinc/nginx-unprivileged:stable, nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}
+          tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}, docker.io/nginxinc/nginx-unprivileged:stable, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}
           push: true
 
-      - name: Sign Docker Manifest
+      - name: Build and push NGINX stable Debian image to GitHub Container Registry
+        uses: docker/build-push-action@v3
+        with:
+          platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/mips64le, linux/ppc64le, linux/s390x
+          context: "{{ defaultContext }}:stable/debian"
+          tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}, ghcr.io/nginxinc/nginx-unprivileged:stable, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}
+          push: true
+
+      - name: Sign Docker Hub Manifest
         run: |
           set -ex
           sudo apt update
@@ -97,16 +112,31 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push NGINX stable perl Debian image
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push NGINX stable perl Debian image to Docker Hub
         id: build
         uses: docker/build-push-action@v3
         with:
           platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/debian-perl"
-          tags: nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-perl, nginxinc/nginx-unprivileged:stable-perl, nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-perl
+          tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-perl, docker.io/nginxinc/nginx-unprivileged:stable-perl, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-perl
           push: true
 
-      - name: Sign Docker Manifest
+      - name: Build and push NGINX stable perl Debian image to GitHub Container Registry
+        uses: docker/build-push-action@v3
+        with:
+          platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
+          context: "{{ defaultContext }}:mainline/debian-perl"
+          tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-perl, ghcr.io/nginxinc/nginx-unprivileged:stable-perl, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-perl
+          push: true
+
+      - name: Sign Docker Hub Manifest
         run: |
           set -ex
           sudo apt update
