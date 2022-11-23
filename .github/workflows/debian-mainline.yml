@@ -143,6 +143,8 @@ jobs:
           context: "{{ defaultContext }}:mainline/debian-perl"
           tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-perl, ghcr.io/nginxinc/nginx-unprivileged:mainline-perl, ghcr.io/nginxinc/nginx-unprivileged:1-perl, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-perl, ghcr.io/nginxinc/nginx-unprivileged:perl
           push: true
+          cache-from: type=gha,scope=debian-perl
+          cache-to: type=gha,mode=max,scope=debian-perl
 
       - name: Sign Docker Hub Manifest
         run: |
