@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
-    needs: version
+    needs: [version, slim]
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v3
@@ -101,7 +101,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
-    needs: version
+    needs: [version, core]
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v3
@@ -202,7 +202,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v3
         with:
-          platforms: linux/amd64, linux/arm64
+          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-slim"
           tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, docker.io/nginxinc/nginx-unprivileged:mainline-alpine-slim, docker.io/nginxinc/nginx-unprivileged:1-alpine-slim, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, docker.io/nginxinc/nginx-unprivileged:alpine-slim
           push: true
@@ -212,7 +212,7 @@ jobs:
       - name: Build and push NGINX mainline slim Alpine image to GitHub Container Registry
         uses: docker/build-push-action@v3
         with:
-          platforms: linux/amd64, linux/arm64
+          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-slim"
           tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:mainline-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:1-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:alpine-slim
           push: true

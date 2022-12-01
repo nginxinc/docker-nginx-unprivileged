@@ -9,7 +9,7 @@ FROM $IMAGE
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
 ENV NGINX_VERSION   1.22.1
-ENV NJS_VERSION     0.7.7
+ENV NJS_VERSION     0.7.9
 ENV PKG_RELEASE     1~bullseye
 
 ARG UID=101

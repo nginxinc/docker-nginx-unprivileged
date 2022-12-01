@@ -3,22 +3,10 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-ARG IMAGE=debian:bullseye-slim
+ARG IMAGE=nginxinc/nginx-unprivileged:1.23.2
 FROM $IMAGE
 
-LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
-
-ENV NGINX_VERSION   1.23.2
-ENV NJS_VERSION     0.7.7
-ENV PKG_RELEASE     1~bullseye
-
-ARG UID=101
-ARG GID=101
-
 RUN set -x \
-# create nginx user/group first, to be consistent throughout docker variants
-    && addgroup --system --gid $GID nginx || true \
-    && adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid $UID nginx || true \
     && apt-get update \
     && apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
     && \
@@ -63,11 +51,11 @@ RUN set -x \
             \
 # build .deb files from upstream's source packages (which are verified by apt-get)
             && apt-get update \
-            && apt-get build-dep -y $nginxPackages \
+            && apt-get build-dep -y nginx-module-perl=${NGINX_VERSION}-${PKG_RELEASE} \
             && ( \
                 cd "$tempDir" \
                 && DEB_BUILD_OPTIONS="nocheck parallel=$(nproc)" \
-                    apt-get source --compile $nginxPackages \
+                    apt-get source --compile nginx-module-perl=${NGINX_VERSION}-${PKG_RELEASE} \
             ) \
 # we don't remove APT lists here because they get re-downloaded and removed later
             \
@@ -99,34 +87,4 @@ RUN set -x \
     && if [ -n "$tempDir" ]; then \
         apt-get purge -y --auto-remove \
         && rm -rf "$tempDir" /etc/apt/sources.list.d/temp.list; \
-    fi \
-# forward request and error logs to docker log collector
-    && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log \
-# create a docker-entrypoint.d directory
-    && mkdir /docker-entrypoint.d
-
-# implement changes required to run NGINX as an unprivileged user
-RUN sed -i 's,listen       80;,listen       8080;,' /etc/nginx/conf.d/default.conf \
-    && sed -i '/user  nginx;/d' /etc/nginx/nginx.conf \
-    && sed -i 's,/var/run/nginx.pid,/tmp/nginx.pid,' /etc/nginx/nginx.conf \
-    && sed -i "/^http {/a \    proxy_temp_path /tmp/proxy_temp;\n    client_body_temp_path /tmp/client_temp;\n    fastcgi_temp_path /tmp/fastcgi_temp;\n    uwsgi_temp_path /tmp/uwsgi_temp;\n    scgi_temp_path /tmp/scgi_temp;\n" /etc/nginx/nginx.conf \
-# nginx user must own the cache and etc directory to write cache and tweak the nginx config
-    && chown -R $UID:0 /var/cache/nginx \
-    && chmod -R g+w /var/cache/nginx \
-    && chown -R $UID:0 /etc/nginx \
-    && chmod -R g+w /etc/nginx
-
-COPY docker-entrypoint.sh /
-COPY 10-listen-on-ipv6-by-default.sh /docker-entrypoint.d
-COPY 20-envsubst-on-templates.sh /docker-entrypoint.d
-COPY 30-tune-worker-processes.sh /docker-entrypoint.d
-ENTRYPOINT ["/docker-entrypoint.sh"]
-
-EXPOSE 8080
-
-STOPSIGNAL SIGQUIT
-
-USER $UID
-
-CMD ["nginx", "-g", "daemon off;"]
+    fi

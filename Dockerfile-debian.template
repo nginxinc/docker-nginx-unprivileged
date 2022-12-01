@@ -52,11 +52,11 @@ RUN set -x \
             \
 # build .deb files from upstream's source packages (which are verified by apt-get)
             && apt-get update \
-            && apt-get build-dep -y $nginxPackages \
+            && apt-get build-dep -y %%BUILDTARGET%% \
             && ( \
                 cd "$tempDir" \
                 && DEB_BUILD_OPTIONS="nocheck parallel=$(nproc)" \
-                    apt-get source --compile $nginxPackages \
+                    apt-get source --compile %%BUILDTARGET%% \
             ) \
 # we don't remove APT lists here because they get re-downloaded and removed later
             \
