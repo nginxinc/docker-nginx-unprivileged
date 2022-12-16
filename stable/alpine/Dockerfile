@@ -6,6 +6,8 @@
 ARG IMAGE=nginxinc/nginx-unprivileged:1.22.1-alpine-slim
 FROM $IMAGE
 
+USER root
+
 ENV NJS_VERSION   0.7.9
 
 RUN set -x \
@@ -87,3 +89,5 @@ RUN set -x \
     && if [ -n "/etc/apk/keys/nginx_signing.rsa.pub" ]; then rm -f /etc/apk/keys/nginx_signing.rsa.pub; fi \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
     && apk add --no-cache curl ca-certificates
+
+USER nginx

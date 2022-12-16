@@ -6,6 +6,8 @@
 ARG IMAGE=nginxinc/nginx-unprivileged:1.22.1
 FROM $IMAGE
 
+USER root
+
 RUN set -x \
     && apt-get update \
     && apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
@@ -88,3 +90,5 @@ RUN set -x \
         apt-get purge -y --auto-remove \
         && rm -rf "$tempDir" /etc/apt/sources.list.d/temp.list; \
     fi
+
+USER nginx

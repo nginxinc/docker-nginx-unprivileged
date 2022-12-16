@@ -6,6 +6,8 @@
 ARG IMAGE=nginxinc/nginx-unprivileged:1.22.1-alpine
 FROM $IMAGE
 
+USER root
+
 RUN set -x \
     && apkArch="$(cat /etc/apk/arch)" \
     && nginxPackages=" \
@@ -81,3 +83,5 @@ RUN set -x \
     && if [ -n "$tempDir" ]; then rm -rf "$tempDir"; fi \
     && if [ -n "/etc/apk/keys/abuild-key.rsa.pub" ]; then rm -f /etc/apk/keys/abuild-key.rsa.pub; fi \
     && if [ -n "/etc/apk/keys/nginx_signing.rsa.pub" ]; then rm -f /etc/apk/keys/nginx_signing.rsa.pub; fi
+
+USER nginx
