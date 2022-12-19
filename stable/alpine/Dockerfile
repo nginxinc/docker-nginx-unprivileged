@@ -90,4 +90,4 @@ RUN set -x \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
     && apk add --no-cache curl ca-certificates
 
-USER nginx
+USER $UID

@@ -91,4 +91,4 @@ RUN set -x \
         && rm -rf "$tempDir" /etc/apt/sources.list.d/temp.list; \
     fi
 
-USER nginx
+USER $UID
