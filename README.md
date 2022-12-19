@@ -19,8 +19,9 @@ Check out the [docs](https://hub.docker.com/_/nginx) for the upstream Docker NGI
 
 You can find built images in the following registries:
 
-* GitHub Container Registry - <https://github.com/nginxinc/docker-nginx-unprivileged/pkgs/container/nginx-unprivileged>
+* Amazon ECR - <https://gallery.ecr.aws/nginx/nginx-unprivileged>
 * Docker Hub - <https://hub.docker.com/r/nginxinc/nginx-unprivileged>
+* GitHub Container Registry - <https://github.com/nginxinc/docker-nginx-unprivileged/pkgs/container/nginx-unprivileged>
 
 ### Platforms
 

@@ -39,6 +39,18 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: public
+
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -51,6 +63,16 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push NGINX mainline Alpine image to Amazon ECR
+        uses: docker/build-push-action@v3
+        with:
+          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
+          context: "{{ defaultContext }}:mainline/alpine"
+          tags: public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine, public.ecr.aws/nginx/nginx-unprivileged:mainline-alpine, public.ecr.aws/nginx/nginx-unprivileged:1-alpine, public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine, public.ecr.aws/nginx/nginx-unprivileged:alpine
+          push: true
+          cache-from: type=gha,scope=alpine
+          cache-to: type=gha,mode=max,scope=alpine
 
       - name: Build and push NGINX mainline Alpine image to Docker Hub
         id: build
@@ -112,6 +134,18 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: public
+
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -124,6 +158,16 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push NGINX mainline perl Alpine image to Amazon ECR
+        uses: docker/build-push-action@v3
+        with:
+          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
+          context: "{{ defaultContext }}:mainline/alpine-perl"
+          tags: public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-perl, public.ecr.aws/nginx/nginx-unprivileged:mainline-alpine-perl, public.ecr.aws/nginx/nginx-unprivileged:1-alpine-perl, public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-perl, public.ecr.aws/nginx/nginx-unprivileged:alpine-perl
+          push: true
+          cache-from: type=gha,scope=alpine-perl
+          cache-to: type=gha,mode=max,scope=alpine-perl
 
       - name: Build and push NGINX mainline perl Alpine image to Docker Hub
         id: build
@@ -185,6 +229,18 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: public
+
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -197,6 +253,16 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push NGINX mainline slim Alpine image to Amazon ECR
+        uses: docker/build-push-action@v3
+        with:
+          platforms: linux/amd64, linux/arm64
+          context: "{{ defaultContext }}:mainline/alpine-slim"
+          tags: public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, public.ecr.aws/nginx/nginx-unprivileged:mainline-alpine-slim, public.ecr.aws/nginx/nginx-unprivileged:1-alpine-slim, public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, public.ecr.aws/nginx/nginx-unprivileged:alpine-slim
+          push: true
+          cache-from: type=gha,scope=alpine-slim
+          cache-to: type=gha,mode=max,scope=alpine-slim
 
       - name: Build and push NGINX mainline slim Alpine image to Docker Hub
         id: build
