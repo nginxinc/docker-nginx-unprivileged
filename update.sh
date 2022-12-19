@@ -18,8 +18,8 @@ declare -A nginx=(
 
 # Current njs versions
 declare -A njs=(
-    [mainline]='0.7.7'
-    [stable]='0.7.7'
+    [mainline]='0.7.9'
+    [stable]='0.7.9'
 )
 
 # Current package patchlevel version
@@ -35,8 +35,8 @@ declare -A debian=(
 )
 
 declare -A alpine=(
-    [mainline]='3.16'
-    [stable]='3.16'
+    [mainline]='3.17'
+    [stable]='3.17'
 )
 
 # When we bump njs version in a stable release we don't move the tag in the
@@ -44,16 +44,16 @@ declare -A alpine=(
 # when building alpine packages on architectures not supported by nginx.org
 # Remember to update pkgosschecksum when changing this.
 declare -A rev=(
-    [mainline]='${NGINX_VERSION}-${PKG_RELEASE}'
-    [stable]='${NGINX_VERSION}-${PKG_RELEASE}'
+    [mainline]='756'
+    [stable]='757'
 )
 
 # Holds SHA512 checksum for the pkg-oss tarball produced by source code
 # revision/tag in the previous block
 # Used in alpine builds for architectures not packaged by nginx.org
 declare -A pkgosschecksum=(
-    [mainline]='98d244d5dea3f0c49692843b1857e21dc7353e749f9ff8a526036a3beeea299e156183b6a98070ffc68a23d191e1f24c577d7ea874f8cc27ce01f4dc832658b6'
-    [stable]='7266f418dcc9d89a2990f504d99ec58d10febbaf078c03630d42843955cee7e50b0f90fb317360384a32473839dc42d8b329b737015ec8dd0d028f90d4d5ed25'
+    [mainline]='5e79f9be4f8ba037fa8138fe50a8fc9e41a0192c1d8c9b2cc58b5c5f5eb3ac66b4807083d25ca21363f07075320a7566eb3e4d3317aa01d3b3e23b20943c411f'
+    [stable]='32a039e8d3cc54404a8ad4a31981e76a49632f1ebec2f45bb309689d6ba2f82e3e8aea8abf582b49931636ea53271b48a7e2f2ef8ebe35b167b3fe18b8b99852'
 )
 
 get_packages() {
@@ -123,6 +123,27 @@ get_packagever() {
     echo ${pkg[$branch]}${suffix}
 }
 
+get_buildtarget() {
+    local distro="$1"
+    case "$distro" in
+        alpine-slim)
+            echo base
+            ;;
+        alpine-perl)
+            echo module-perl
+            ;;
+        alpine)
+            echo module-geoip module-image-filter module-njs module-xslt
+            ;;
+        debian)
+            echo "\$nginxPackages"
+            ;;
+        debian-perl)
+            echo "nginx-module-perl=\${NGINX_VERSION}-\${PKG_RELEASE}"
+            ;;
+    esac
+}
+
 generated_warning() {
     cat <<__EOF__
 #
@@ -137,13 +158,13 @@ for branch in "${branches[@]}"; do
     for variant in \
         alpine{,-perl,-slim} \
         debian{,-perl}; do
-        echo "$branch: $variant"
+        echo "$branch: $variant dockerfiles"
         dir="$branch/$variant"
         variant="$(basename "$variant")"
 
         [ -d "$dir" ] || continue
 
-        template="Dockerfile-${variant%-perl}.template"
+        template="Dockerfile-${variant%}.template"
         {
             generated_warning
             cat "$template"
@@ -159,6 +180,7 @@ for branch in "${branches[@]}"; do
         packagerepo=$(get_packagerepo "$variant" "$branch")
         packages=$(get_packages "$variant" "$branch")
         packagever=$(get_packagever "$variant" "$branch")
+        buildtarget=$(get_buildtarget "$variant")
 
         sed -i \
             -e 's,%%ALPINE_VERSION%%,'"$alpinever"',' \
@@ -170,9 +192,16 @@ for branch in "${branches[@]}"; do
             -e 's,%%PACKAGEREPO%%,'"$packagerepo"',' \
             -e 's,%%REVISION%%,'"$revver"',' \
             -e 's,%%PKGOSSCHECKSUM%%,'"$pkgosschecksumver"',' \
+            -e 's,%%BUILDTARGET%%,'"$buildtarget"',' \
             "$dir/Dockerfile"
 
-        cp -a entrypoint/*.sh "$dir/"
+        done
 
+    for variant in \
+        alpine-slim \
+        debian; do \
+        echo "$branch: $variant entrypoint scripts"
+        dir="$branch/$variant"
+        cp -a entrypoint/*.sh "$dir/"
     done
 done

@@ -99,7 +99,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
-    needs: version
+    needs: [version, core]
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v3

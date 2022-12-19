@@ -24,7 +24,7 @@ You can find built images in the following registries:
 
 ### Platforms
 
-Most images are built for the `amd64`, `arm32v5` (for Debian), `arm32v6` (for Alpine), `arm32v7`, `arm64v8`, `i386`, `mips64le` (for Debian), `ppc64le` and `s390x` architectures. Alpine slim images are only built for `amd64` and `arm64v8`.
+Most images are built for the `amd64`, `arm32v5` (for Debian), `arm32v6` (for Alpine), `arm32v7`, `arm64v8`, `i386`, `mips64le` (for Debian), `ppc64le` and `s390x` architectures.
 
 ## Common Issues
 
