@@ -1,6 +1,9 @@
 ARG IMAGE=nginxinc/nginx-unprivileged:%%NGINX_VERSION%%-alpine
 FROM $IMAGE
 
+ARG UID=101
+ARG GID=101
+
 USER root
 
 RUN set -x \

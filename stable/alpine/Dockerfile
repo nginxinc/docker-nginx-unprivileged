@@ -6,9 +6,12 @@
 ARG IMAGE=nginxinc/nginx-unprivileged:1.22.1-alpine-slim
 FROM $IMAGE
 
-USER root
-
 ENV NJS_VERSION   0.7.9
+
+ARG UID=101
+ARG GID=101
+
+USER root
 
 RUN set -x \
     && apkArch="$(cat /etc/apk/arch)" \

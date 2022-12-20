@@ -6,6 +6,9 @@
 ARG IMAGE=nginxinc/nginx-unprivileged:1.22.1-alpine
 FROM $IMAGE
 
+ARG UID=101
+ARG GID=101
+
 USER root
 
 RUN set -x \
