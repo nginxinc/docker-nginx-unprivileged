@@ -65,7 +65,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push NGINX mainline Alpine image to Amazon ECR
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine"
@@ -76,7 +76,7 @@ jobs:
 
       - name: Build and push NGINX mainline Alpine image to Docker Hub
         id: build
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine"
@@ -86,7 +86,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=alpine
 
       - name: Build and push NGINX mainline Alpine image to GitHub Container Registry
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine"
@@ -160,7 +160,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push NGINX mainline perl Alpine image to Amazon ECR
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-perl"
@@ -171,7 +171,7 @@ jobs:
 
       - name: Build and push NGINX mainline perl Alpine image to Docker Hub
         id: build
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-perl"
@@ -181,7 +181,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=alpine-perl
 
       - name: Build and push NGINX mainline perl Alpine image to GitHub Container Registry
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-perl"
@@ -255,7 +255,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push NGINX mainline slim Alpine image to Amazon ECR
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-slim"
@@ -266,7 +266,7 @@ jobs:
 
       - name: Build and push NGINX mainline slim Alpine image to Docker Hub
         id: build
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-slim"
@@ -276,7 +276,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=alpine-slim
 
       - name: Build and push NGINX mainline slim Alpine image to GitHub Container Registry
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-slim"
