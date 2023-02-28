@@ -29,4 +29,4 @@ Most images are built for the `amd64`, `arm32v5` (for Debian), `arm32v6` (for Al
 
 ## Common Issues
 
-* If you overrive the default `nginx.conf` file you may receive the message `nginx: [emerg] open() "/var/run/nginx.pid" failed (13: Permission denied)`, in this case you have to add the line `pid /tmp/nginx.pid` into your config.
+* If you override the default `nginx.conf` file you may receive the message `nginx: [emerg] open() "/var/run/nginx.pid" failed (13: Permission denied)`, in this case you have to add the line `pid /tmp/nginx.pid` into your config.
