@@ -71,8 +71,8 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine"
           tags: public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine, public.ecr.aws/nginx/nginx-unprivileged:mainline-alpine, public.ecr.aws/nginx/nginx-unprivileged:1-alpine, public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine, public.ecr.aws/nginx/nginx-unprivileged:alpine
           push: true
-          cache-from: type=gha,scope=alpine
-          cache-to: type=gha,mode=max,scope=alpine
+          # cache-from: type=gha,scope=alpine
+          # cache-to: type=gha,mode=min,scope=alpine
 
       - name: Build and push NGINX mainline Alpine image to Docker Hub
         id: build
@@ -82,8 +82,8 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine"
           tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine, docker.io/nginxinc/nginx-unprivileged:mainline-alpine, docker.io/nginxinc/nginx-unprivileged:1-alpine, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine, docker.io/nginxinc/nginx-unprivileged:alpine
           push: true
-          cache-from: type=gha,scope=alpine
-          cache-to: type=gha,mode=max,scope=alpine
+          # cache-from: type=gha,scope=alpine
+          # cache-to: type=gha,mode=min,scope=alpine
 
       - name: Build and push NGINX mainline Alpine image to GitHub Container Registry
         uses: docker/build-push-action@v4
@@ -92,8 +92,8 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine"
           tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine, ghcr.io/nginxinc/nginx-unprivileged:mainline-alpine, ghcr.io/nginxinc/nginx-unprivileged:1-alpine, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine, ghcr.io/nginxinc/nginx-unprivileged:alpine
           push: true
-          cache-from: type=gha,scope=alpine
-          cache-to: type=gha,mode=max,scope=alpine
+          # cache-from: type=gha,scope=alpine
+          # cache-to: type=gha,mode=min,scope=alpine
 
       - name: Sign Docker Hub Manifest
         run: |
@@ -166,8 +166,8 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine-perl"
           tags: public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-perl, public.ecr.aws/nginx/nginx-unprivileged:mainline-alpine-perl, public.ecr.aws/nginx/nginx-unprivileged:1-alpine-perl, public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-perl, public.ecr.aws/nginx/nginx-unprivileged:alpine-perl
           push: true
-          cache-from: type=gha,scope=alpine-perl
-          cache-to: type=gha,mode=max,scope=alpine-perl
+          # cache-from: type=gha,scope=alpine-perl
+          # cache-to: type=gha,mode=min,scope=alpine-perl
 
       - name: Build and push NGINX mainline perl Alpine image to Docker Hub
         id: build
@@ -177,8 +177,8 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine-perl"
           tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-perl, docker.io/nginxinc/nginx-unprivileged:mainline-alpine-perl, docker.io/nginxinc/nginx-unprivileged:1-alpine-perl, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-perl, docker.io/nginxinc/nginx-unprivileged:alpine-perl
           push: true
-          cache-from: type=gha,scope=alpine-perl
-          cache-to: type=gha,mode=max,scope=alpine-perl
+          # cache-from: type=gha,scope=alpine-perl
+          # cache-to: type=gha,mode=min,scope=alpine-perl
 
       - name: Build and push NGINX mainline perl Alpine image to GitHub Container Registry
         uses: docker/build-push-action@v4
@@ -187,8 +187,8 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine-perl"
           tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-perl, ghcr.io/nginxinc/nginx-unprivileged:mainline-alpine-perl, ghcr.io/nginxinc/nginx-unprivileged:1-alpine-perl, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-perl, ghcr.io/nginxinc/nginx-unprivileged:alpine-perl
           push: true
-          cache-from: type=gha,scope=alpine-perl
-          cache-to: type=gha,mode=max,scope=alpine-perl
+          # cache-from: type=gha,scope=alpine-perl
+          # cache-to: type=gha,mode=min,scope=alpine-perl
 
       - name: Sign Docker Hub Manifest
         run: |
@@ -261,8 +261,8 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine-slim"
           tags: public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, public.ecr.aws/nginx/nginx-unprivileged:mainline-alpine-slim, public.ecr.aws/nginx/nginx-unprivileged:1-alpine-slim, public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, public.ecr.aws/nginx/nginx-unprivileged:alpine-slim
           push: true
-          cache-from: type=gha,scope=alpine-slim
-          cache-to: type=gha,mode=max,scope=alpine-slim
+          # cache-from: type=gha,scope=alpine-slim
+          # cache-to: type=gha,mode=min,scope=alpine-slim
 
       - name: Build and push NGINX mainline slim Alpine image to Docker Hub
         id: build
@@ -272,8 +272,8 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine-slim"
           tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, docker.io/nginxinc/nginx-unprivileged:mainline-alpine-slim, docker.io/nginxinc/nginx-unprivileged:1-alpine-slim, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, docker.io/nginxinc/nginx-unprivileged:alpine-slim
           push: true
-          cache-from: type=gha,scope=alpine-slim
-          cache-to: type=gha,mode=max,scope=alpine-slim
+          # cache-from: type=gha,scope=alpine-slim
+          # cache-to: type=gha,mode=min,scope=alpine-slim
 
       - name: Build and push NGINX mainline slim Alpine image to GitHub Container Registry
         uses: docker/build-push-action@v4
@@ -282,8 +282,8 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine-slim"
           tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:mainline-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:1-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:alpine-slim
           push: true
-          cache-from: type=gha,scope=alpine-slim
-          cache-to: type=gha,mode=max,scope=alpine-slim
+          # cache-from: type=gha,scope=alpine-slim
+          # cache-to: type=gha,mode=min,scope=alpine-slim
 
       - name: Sign Docker Hub Manifest
         run: |
