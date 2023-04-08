@@ -78,16 +78,16 @@ jobs:
             docker.io/nginxinc/nginx-unprivileged
             ghcr.io/nginxinc/nginx-unprivileged
           tags: |
-            type=semver,pattern={{ needs.version.outputs.major }}.{{ needs.version.outputs.minor }}.{{ needs.version.outputs.patch }}
-            type=semver,pattern={{ needs.version.outputs.major }}.{{ needs.version.outputs.minor }}.{{ needs.version.outputs.patch }}-{{ needs.version.outputs.distro }}
-            type=semver,pattern={{ needs.version.outputs.major }}.{{ needs.version.outputs.minor }}
-            type=semver,pattern={{ needs.version.outputs.major }}.{{ needs.version.outputs.minor }}-{{ needs.version.outputs.distro }}
-            type=semver,pattern={{ needs.version.outputs.major }}
-            type=semver,pattern={{ needs.version.outputs.major }}-{{ needs.version.outputs.distro }}
-            type=semver,pattern=mainline
-            type=semver,pattern=mainline-{{ needs.version.outputs.distro }}
-            type=semver,pattern=latest
-            type=semver,pattern={{ needs.version.outputs.distro }}
+            type=raw,value={{ needs.version.outputs.major }}.{{ needs.version.outputs.minor }}.{{ needs.version.outputs.patch }}
+            type=raw,value={{ needs.version.outputs.major }}.{{ needs.version.outputs.minor }}.{{ needs.version.outputs.patch }}-{{ needs.version.outputs.distro }}
+            type=raw,value={{ needs.version.outputs.major }}.{{ needs.version.outputs.minor }}
+            type=raw,value={{ needs.version.outputs.major }}.{{ needs.version.outputs.minor }}-{{ needs.version.outputs.distro }}
+            type=raw,value={{ needs.version.outputs.major }}
+            type=raw,value={{ needs.version.outputs.major }}-{{ needs.version.outputs.distro }}
+            type=raw,value=mainline
+            type=raw,value=mainline-{{ needs.version.outputs.distro }}
+            type=raw,value=latest
+            type=raw,value={{ needs.version.outputs.distro }}
 
       - name: Build and push NGINX mainline Debian image to Amazon ECR, Docker Hub, and GitHub Container Registry
         uses: docker/build-push-action@v4
