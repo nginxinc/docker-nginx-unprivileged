@@ -97,7 +97,7 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: false
+          push: true
           # cache-from: type=gha,scope=debian-perl
           # cache-to: type=gha,mode=min,scope=debian-perl
 
@@ -198,7 +198,7 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine-perl"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: false
+          push: true
           # cache-from: type=gha,scope=alpine-perl
           # cache-to: type=gha,mode=min,scope=alpine-perl
 
@@ -299,7 +299,7 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine-slim"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: false
+          push: true
           # cache-from: type=gha,scope=alpine-slim
           # cache-to: type=gha,mode=min,scope=alpine-slim
 
