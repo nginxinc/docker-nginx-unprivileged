@@ -23,6 +23,11 @@ jobs:
           echo "minor=$(cat update.sh | grep -m1 '\[stable\]=' | cut -d"'" -f2 | cut -d"." -f2)" >> "$GITHUB_OUTPUT"
           echo "patch=$(cat update.sh | grep -m1 '\[stable\]=' | cut -d"'" -f2 | cut -d"." -f3)" >> "$GITHUB_OUTPUT"
 
+      - name: Parse Alpine version
+        id: distro
+        run: |
+          echo "distro=$(cat update.sh | grep -m4 '\[stable\]=' | tail -n1 | cut -d"'" -f2)" >> "$GITHUB_OUTPUT"
+
   core:
     name: Build Debian NGINX stable Docker image
     runs-on: ubuntu-22.04
@@ -64,34 +69,31 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push NGINX stable Debian image to Amazon ECR
-        uses: docker/build-push-action@v4
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
         with:
-          platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/mips64le, linux/ppc64le, linux/s390x
-          context: "{{ defaultContext }}:stable/debian"
-          tags: public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}, public.ecr.aws/nginx/nginx-unprivileged:stable, public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}
-          push: true
-          # cache-from: type=gha,scope=stable-debian
-          # cache-to: type=gha,mode=min,scope=stable-debian
+          images: |
+            public.ecr.aws/nginx/nginx-unprivileged
+            docker.io/nginxinc/nginx-unprivileged
+            ghcr.io/nginxinc/nginx-unprivileged
+          tags: |
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-${{ needs.version.outputs.distro }}
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-${{ needs.version.outputs.distro }}
+            type=raw,value=stable
+            type=raw,value=stable-${{ needs.version.outputs.distro }}
 
-      - name: Build and push NGINX stable Debian image to Docker Hub
+      - name: Build and push NGINX stable Debian image to Amazon ECR, Docker Hub and GitHub Container Registry
         id: build
         uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/mips64le, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:stable/debian"
-          tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}, docker.io/nginxinc/nginx-unprivileged:stable, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}
-          push: true
-          # cache-from: type=gha,scope=stable-debian
-          # cache-to: type=gha,mode=min,scope=stable-debian
-
-      - name: Build and push NGINX stable Debian image to GitHub Container Registry
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/mips64le, linux/ppc64le, linux/s390x
-          context: "{{ defaultContext }}:stable/debian"
-          tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}, ghcr.io/nginxinc/nginx-unprivileged:stable, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}
-          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: false
           # cache-from: type=gha,scope=stable-debian
           # cache-to: type=gha,mode=min,scope=stable-debian
 
@@ -108,8 +110,11 @@ jobs:
           SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
           export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }} $SIZE --sha256 $DIGEST --publish --verbose
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged stable $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-${{ needs.version.outputs.distro }} $SIZE --sha256 $DIGEST --publish --verbose
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }} $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-${{ needs.version.outputs.distro }} $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged stable $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged stable-${{ needs.version.outputs.distro }} $SIZE --sha256 $DIGEST --publish --verbose
         env:
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
@@ -157,34 +162,31 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push NGINX stable perl Debian image to Amazon ECR
-        uses: docker/build-push-action@v4
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
         with:
-          platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
-          context: "{{ defaultContext }}:mainline/debian-perl"
-          tags: public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-perl, public.ecr.aws/nginx/nginx-unprivileged:stable-perl, public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-perl
-          push: true
-          # cache-from: type=gha,scope=stable-debian-perl
-          # cache-to: type=gha,mode=min,scope=stable-debian-perl
+          images: |
+            public.ecr.aws/nginx/nginx-unprivileged
+            docker.io/nginxinc/nginx-unprivileged
+            ghcr.io/nginxinc/nginx-unprivileged
+          tags: |
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-perl
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-${{ needs.version.outputs.distro }}-perl
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-perl
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-${{ needs.version.outputs.distro }}-perl
+            type=raw,value=stable-perl
+            type=raw,value=stable-${{ needs.version.outputs.distro }}-perl
 
-      - name: Build and push NGINX stable perl Debian image to Docker Hub
+      - name: Build and push NGINX stable perl Debian image to Amazon ECR, Docker Hub and GitHub Container Registry
         id: build
         uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/debian-perl"
-          tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-perl, docker.io/nginxinc/nginx-unprivileged:stable-perl, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-perl
-          push: true
-          # cache-from: type=gha,scope=stable-debian-perl
-          # cache-to: type=gha,mode=min,scope=stable-debian-perl
-
-      - name: Build and push NGINX stable perl Debian image to GitHub Container Registry
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
-          context: "{{ defaultContext }}:mainline/debian-perl"
-          tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-perl, ghcr.io/nginxinc/nginx-unprivileged:stable-perl, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-perl
-          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: false
           # cache-from: type=gha,scope=stable-debian-perl
           # cache-to: type=gha,mode=min,scope=stable-debian-perl
 
@@ -201,8 +203,11 @@ jobs:
           SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
           export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-perl $SIZE --sha256 $DIGEST --publish --verbose
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged stable-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-${{ needs.version.outputs.distro }}-perl $SIZE --sha256 $DIGEST --publish --verbose
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-${{ needs.version.outputs.distro }}-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged stable-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged stable--${{ needs.version.outputs.distro }}perl $SIZE --sha256 $DIGEST --publish --verbose
         env:
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}

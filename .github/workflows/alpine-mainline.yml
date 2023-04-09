@@ -23,6 +23,11 @@ jobs:
           echo "minor=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f2)" >> "$GITHUB_OUTPUT"
           echo "patch=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f3)" >> "$GITHUB_OUTPUT"
 
+      - name: Parse Alpine version
+        id: distro
+        run: |
+          echo "distro=$(cat update.sh | grep -m5 '\[mainline\]=' | tail -n1 | cut -d"'" -f2)" >> "$GITHUB_OUTPUT"
+
   core:
     name: Build Alpine NGINX mainline Docker image
     runs-on: ubuntu-22.04
@@ -64,36 +69,37 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push NGINX mainline Alpine image to Amazon ECR
-        uses: docker/build-push-action@v4
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
         with:
-          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
-          context: "{{ defaultContext }}:mainline/alpine"
-          tags: public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine, public.ecr.aws/nginx/nginx-unprivileged:mainline-alpine, public.ecr.aws/nginx/nginx-unprivileged:1-alpine, public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine, public.ecr.aws/nginx/nginx-unprivileged:alpine
-          push: true
-          # cache-from: type=gha,scope=alpine
-          # cache-to: type=gha,mode=min,scope=alpine
+          images: |
+            public.ecr.aws/nginx/nginx-unprivileged
+            docker.io/nginxinc/nginx-unprivileged
+            ghcr.io/nginxinc/nginx-unprivileged
+          tags: |
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}
+            type=raw,value=${{ needs.version.outputs.major }}-alpine
+            type=raw,value=${{ needs.version.outputs.major }}-alpine${{ needs.version.outputs.distro }}
+            type=raw,value=mainline-alpine
+            type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}
+            type=raw,value=alpine
+            type=raw,value=alpine${{ needs.version.outputs.distro }}
 
-      - name: Build and push NGINX mainline Alpine image to Docker Hub
+      - name: Build and push NGINX mainline Alpine image to Amazon ECR, Docker Hub, and GitHub Container Registry
         id: build
         uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine"
-          tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine, docker.io/nginxinc/nginx-unprivileged:mainline-alpine, docker.io/nginxinc/nginx-unprivileged:1-alpine, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine, docker.io/nginxinc/nginx-unprivileged:alpine
-          push: true
-          # cache-from: type=gha,scope=alpine
-          # cache-to: type=gha,mode=min,scope=alpine
-
-      - name: Build and push NGINX mainline Alpine image to GitHub Container Registry
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
-          context: "{{ defaultContext }}:mainline/alpine"
-          tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine, ghcr.io/nginxinc/nginx-unprivileged:mainline-alpine, ghcr.io/nginxinc/nginx-unprivileged:1-alpine, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine, ghcr.io/nginxinc/nginx-unprivileged:alpine
-          push: true
-          # cache-from: type=gha,scope=alpine
-          # cache-to: type=gha,mode=min,scope=alpine
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: false
+          # cache-from: type=gha,scope=debian-perl
+          # cache-to: type=gha,mode=min,scope=debian-perl
 
       - name: Sign Docker Hub Manifest
         run: |
@@ -108,10 +114,15 @@ jobs:
           SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
           export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine $SIZE --sha256 $DIGEST --publish --verbose
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged mainline-alpine $SIZE --sha256 $DIGEST --publish --verbose
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged 1-alpine $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }} $SIZE --sha256 $DIGEST --publish --verbose
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }} $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}-alpine $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}-alpine${{ needs.version.outputs.distro }} $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged mainline-alpine $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged mainline-alpine${{ needs.version.outputs.distro }} $SIZE --sha256 $DIGEST --publish --verbose
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged alpine $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged alpine${{ needs.version.outputs.distro }} $SIZE --sha256 $DIGEST --publish --verbose
         env:
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
@@ -159,34 +170,35 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push NGINX mainline perl Alpine image to Amazon ECR
-        uses: docker/build-push-action@v4
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
         with:
-          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
-          context: "{{ defaultContext }}:mainline/alpine-perl"
-          tags: public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-perl, public.ecr.aws/nginx/nginx-unprivileged:mainline-alpine-perl, public.ecr.aws/nginx/nginx-unprivileged:1-alpine-perl, public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-perl, public.ecr.aws/nginx/nginx-unprivileged:alpine-perl
-          push: true
-          # cache-from: type=gha,scope=alpine-perl
-          # cache-to: type=gha,mode=min,scope=alpine-perl
+          images: |
+            public.ecr.aws/nginx/nginx-unprivileged
+            docker.io/nginxinc/nginx-unprivileged
+            ghcr.io/nginxinc/nginx-unprivileged
+          tags: |
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-perl
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-perl
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-perl
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-perl
+            type=raw,value=${{ needs.version.outputs.major }}-alpine-perl
+            type=raw,value=${{ needs.version.outputs.major }}-alpine${{ needs.version.outputs.distro }}-perl
+            type=raw,value=mainline-alpine-perl
+            type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}-perl
+            type=raw,value=alpine-perl
+            type=raw,value=alpine${{ needs.version.outputs.distro }}-perl
 
-      - name: Build and push NGINX mainline perl Alpine image to Docker Hub
+      - name: Build and push NGINX mainline perl Alpine image to Amazon ECR, Docker Hub, and GitHub Container Registry
         id: build
         uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-perl"
-          tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-perl, docker.io/nginxinc/nginx-unprivileged:mainline-alpine-perl, docker.io/nginxinc/nginx-unprivileged:1-alpine-perl, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-perl, docker.io/nginxinc/nginx-unprivileged:alpine-perl
-          push: true
-          # cache-from: type=gha,scope=alpine-perl
-          # cache-to: type=gha,mode=min,scope=alpine-perl
-
-      - name: Build and push NGINX mainline perl Alpine image to GitHub Container Registry
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
-          context: "{{ defaultContext }}:mainline/alpine-perl"
-          tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-perl, ghcr.io/nginxinc/nginx-unprivileged:mainline-alpine-perl, ghcr.io/nginxinc/nginx-unprivileged:1-alpine-perl, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-perl, ghcr.io/nginxinc/nginx-unprivileged:alpine-perl
-          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: false
           # cache-from: type=gha,scope=alpine-perl
           # cache-to: type=gha,mode=min,scope=alpine-perl
 
@@ -203,10 +215,15 @@ jobs:
           SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
           export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged mainline-alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged 1-alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-perl $SIZE --sha256 $DIGEST --publish --verbose
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}-alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}-alpine${{ needs.version.outputs.distro }}-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged mainline-alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged mainline-alpine${{ needs.version.outputs.distro }}-perl $SIZE --sha256 $DIGEST --publish --verbose
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged alpine-perl $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged alpine${{ needs.version.outputs.distro }}-perl $SIZE --sha256 $DIGEST --publish --verbose
         env:
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
@@ -254,34 +271,35 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push NGINX mainline slim Alpine image to Amazon ECR
-        uses: docker/build-push-action@v4
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
         with:
-          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
-          context: "{{ defaultContext }}:mainline/alpine-slim"
-          tags: public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, public.ecr.aws/nginx/nginx-unprivileged:mainline-alpine-slim, public.ecr.aws/nginx/nginx-unprivileged:1-alpine-slim, public.ecr.aws/nginx/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, public.ecr.aws/nginx/nginx-unprivileged:alpine-slim
-          push: true
-          # cache-from: type=gha,scope=alpine-slim
-          # cache-to: type=gha,mode=min,scope=alpine-slim
+          images: |
+            public.ecr.aws/nginx/nginx-unprivileged
+            docker.io/nginxinc/nginx-unprivileged
+            ghcr.io/nginxinc/nginx-unprivileged
+          tags: |
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-slim
+            type=raw,value=${{ needs.version.outputs.major }}-alpine-slim
+            type=raw,value=${{ needs.version.outputs.major }}-alpine${{ needs.version.outputs.distro }}-slim
+            type=raw,value=mainline-alpine-slim
+            type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}-slim
+            type=raw,value=alpine-slim
+            type=raw,value=alpine${{ needs.version.outputs.distro }}-slim
 
-      - name: Build and push NGINX mainline slim Alpine image to Docker Hub
+      - name: Build and push NGINX mainline slim Alpine image to Amazon ECR, Docker Hub and GitHub Container Registry
         id: build
         uses: docker/build-push-action@v4
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-slim"
-          tags: docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, docker.io/nginxinc/nginx-unprivileged:mainline-alpine-slim, docker.io/nginxinc/nginx-unprivileged:1-alpine-slim, docker.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, docker.io/nginxinc/nginx-unprivileged:alpine-slim
-          push: true
-          # cache-from: type=gha,scope=alpine-slim
-          # cache-to: type=gha,mode=min,scope=alpine-slim
-
-      - name: Build and push NGINX mainline slim Alpine image to GitHub Container Registry
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
-          context: "{{ defaultContext }}:mainline/alpine-slim"
-          tags: ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:mainline-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:1-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim, ghcr.io/nginxinc/nginx-unprivileged:alpine-slim
-          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: false
           # cache-from: type=gha,scope=alpine-slim
           # cache-to: type=gha,mode=min,scope=alpine-slim
 
@@ -298,10 +316,15 @@ jobs:
           SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
           export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged mainline-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged 1-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim $SIZE --sha256 $DIGEST --publish --verbose
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}-alpine${{ needs.version.outputs.distro }}-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged mainline-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged mainline-alpine${{ needs.version.outputs.distro }}-slim $SIZE --sha256 $DIGEST --publish --verbose
           notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged alpine${{ needs.version.outputs.distro }}-slim $SIZE --sha256 $DIGEST --publish --verbose
         env:
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
