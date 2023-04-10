@@ -12,6 +12,7 @@ jobs:
       major: ${{ steps.version.outputs.major }}
       minor: ${{ steps.version.outputs.minor }}
       patch: ${{ steps.version.outputs.patch }}
+      distro: ${{ steps.version.outputs.distro }}
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v3
