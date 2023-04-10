@@ -9,25 +9,25 @@ jobs:
     name: Fetch NGINX mainline version
     runs-on: ubuntu-22.04
     outputs:
-      major: ${{ steps.version.outputs.major }}
-      minor: ${{ steps.version.outputs.minor }}
-      patch: ${{ steps.version.outputs.patch }}
-      distro: ${{ steps.distro.outputs.distro }}
+      major: ${{ steps.nginx_version.outputs.major }}
+      minor: ${{ steps.nginx_version.outputs.minor }}
+      patch: ${{ steps.nginx_version.outputs.patch }}
+      distro: ${{ steps.distro_version.outputs.release }}
     steps:
       - name: Check out the codebase
         uses: actions/checkout@v3
 
       - name: Parse NGINX mainline version
-        id: version
+        id: nginx_version
         run: |
           echo "major=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f1)" >> "$GITHUB_OUTPUT"
           echo "minor=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f2)" >> "$GITHUB_OUTPUT"
           echo "patch=$(cat update.sh | grep -m1 '\[mainline\]=' | cut -d"'" -f2 | cut -d"." -f3)" >> "$GITHUB_OUTPUT"
 
       - name: Parse Debian version
-        id: distro
+        id: distro_version
         run: |
-          echo "distro=$(cat update.sh | grep -m4 '\[mainline\]=' | tail -n1 | cut -d"'" -f2)" >> "$GITHUB_OUTPUT"
+          echo "release=$(cat update.sh | grep -m4 '\[mainline\]=' | tail -n1 | cut -d"'" -f2)" >> "$GITHUB_OUTPUT"
 
   core:
     name: Build Debian NGINX mainline Docker image
