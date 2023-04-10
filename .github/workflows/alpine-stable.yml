@@ -92,7 +92,7 @@ jobs:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: false
+          push: true
           # cache-from: type=gha,scope=stable-alpine
           # cache-to: type=gha,mode=min,scope=stable-alpine
 
@@ -185,7 +185,7 @@ jobs:
           context: "{{ defaultContext }}:stable/alpine-perl"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: false
+          push: true
           # cache-from: type=gha,scope=stable-alpine-perl
           # cache-to: type=gha,mode=min,scope=stable-alpine-perl
 
@@ -277,7 +277,7 @@ jobs:
           context: "{{ defaultContext }}:stable/alpine-slim"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: false
+          push: true
           # cache-from: type=gha,scope=stable-alpine-slim
           # cache-to: type=gha,mode=min,scope=stable-alpine-slim
 

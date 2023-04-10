@@ -93,7 +93,7 @@ jobs:
           context: "{{ defaultContext }}:stable/debian"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: false
+          push: true
           # cache-from: type=gha,scope=stable-debian
           # cache-to: type=gha,mode=min,scope=stable-debian
 
@@ -186,7 +186,7 @@ jobs:
           context: "{{ defaultContext }}:mainline/debian-perl"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: false
+          push: true
           # cache-from: type=gha,scope=stable-debian-perl
           # cache-to: type=gha,mode=min,scope=stable-debian-perl
 
