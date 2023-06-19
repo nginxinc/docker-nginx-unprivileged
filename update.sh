@@ -12,7 +12,7 @@ declare branches=(
 # Current nginx versions
 # Remember to update pkgosschecksum when changing this.
 declare -A nginx=(
-    [mainline]='1.25.0'
+    [mainline]='1.25.1'
     [stable]='1.24.0'
 )
 

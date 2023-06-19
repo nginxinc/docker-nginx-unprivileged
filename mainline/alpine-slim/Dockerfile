@@ -8,7 +8,7 @@ FROM $IMAGE
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
-ENV NGINX_VERSION 1.25.0
+ENV NGINX_VERSION 1.25.1
 ENV PKG_RELEASE   1
 
 ARG UID=101
