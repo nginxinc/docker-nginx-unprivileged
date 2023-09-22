@@ -1,9 +1,9 @@
 ---
 name: Bug report
 about: Create a bug report to help us improve
-title: ''
-labels: ''
-assignees: ''
+title: ""
+labels: ""
+assignees: ""
 ---
 ### Describe the bug
 
@@ -23,9 +23,9 @@ A clear and concise description of what you expected to happen.
 
 ### Your environment
 
-- Version of Docker
-- Version of the NGINX Unprivileged Docker image
-- Target deployment environment/platform
+- Version of Docker and method of installation (e.g. Docker Desktop / Docker Server)
+- Version/tag of the NGINX Unprivileged Docker image (e.g. `nginxinc/nginx-unprivileged:alpine`)
+- Target deployment environment/platform (e.g. OpenShift / Kubernetes / Docker Compose / etc...)
 
 ### Additional context
 
