@@ -92,7 +92,7 @@ jobs:
 
       - name: Build and push NGINX mainline Debian image to Amazon ECR, Docker Hub, and GitHub Container Registry
         id: build
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/debian"
@@ -193,7 +193,7 @@ jobs:
 
       - name: Build and push NGINX mainline perl Debian image to Amazon ECR, Docker Hub, and GitHub Container Registry
         id: build
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/debian-perl"

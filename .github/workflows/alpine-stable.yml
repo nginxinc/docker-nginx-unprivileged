@@ -88,7 +88,7 @@ jobs:
 
       - name: Build and push NGINX stable Alpine image to Amazon ECR, Docker Hub, and GitHub Container Registry
         id: build
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:stable/alpine"
@@ -181,7 +181,7 @@ jobs:
 
       - name: Build and push NGINX stable perl Alpine image to Amazon ECR, Docker Hub and GitHub Container Registry
         id: build
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:stable/alpine-perl"
@@ -274,7 +274,7 @@ jobs:
 
       - name: Build and push NGINX stable slim Alpine image to Amazon ECR, Docker Hub and GitHub Container Registry
         id: build
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:stable/alpine-slim"
