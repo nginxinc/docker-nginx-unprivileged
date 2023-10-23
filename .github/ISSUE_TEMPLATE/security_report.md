@@ -1,9 +1,9 @@
 ---
 name: Security report
 about: Create a security report to help us improve
-title: ''
-labels: ''
-assignees: ''
+title: ""
+labels: ""
+assignees: ""
 ---
 ### Describe the bug
 
@@ -24,4 +24,4 @@ Steps to reproduce the behavior:
 
 ### Additional context
 
-Does this security vulnerability relate to one of the NGINX libraries specified in the [`SECURITY`](https://github.com/nginxinc/docker-nginx-unprivileged/blob/main/.github/SECURITY.md) doc?
+Does this security vulnerability relate to one of the NGINX libraries specified in the [`SECURITY`](https://github.com/nginxinc/docker-nginx-unprivileged/blob/main/SECURITY.md) doc?

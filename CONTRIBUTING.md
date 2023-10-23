@@ -34,7 +34,7 @@ To report a bug, open an issue on GitHub with the label `bug` using the availabl
 
 ### Report a Security vulnerability
 
-To report a secuirty vulnerability, open an issue on GitHub with the label `security` using the available security report issue template. Please ensure the security vulnerability directly impacts one of the NGINX dependencies listed in the [`SECURITY`](https://github.com/nginxinc/docker-nginx-unprivileged/blob/main/.github/SECURITY.md) doc. Other security vulnerabilities should be addressed by the weekly Monday night build and as such will be promptly closed.
+To report a security vulnerability, open an issue on GitHub with the label `security` using the available security report issue template. Please ensure the security vulnerability directly impacts one of the NGINX dependencies listed in the [`SECURITY`](https://github.com/nginxinc/docker-nginx-unprivileged/blob/main/.github/SECURITY.md) doc. Other security vulnerabilities should be addressed by the weekly Monday night build and as such will be promptly closed.
 
 ### Suggest a Feature or Enhancement
 
@@ -54,7 +54,7 @@ Note: if you'd like to implement a new feature, please consider creating a featu
 Given this repository is a mirror image of the upstream [Docker NGINX image](https://github.com/nginxinc/docker-nginx), only two types of PRs will be considered:
 
 1. PRs that incorporate changes made to upstream images (e.g. there's a new NGINX release).
-2. PRs that add a critical feature or a nice-to-have enhancement for running these images on an unprivileged environment (e.g. allowing users specify the UID/GUI of the image user).
+2. PRs that add a critical feature or a nice-to-have enhancement for running these images on an unprivileged environment (e.g. allowing users specify to the UID/GID of the image user).
 
 ### Git Guidelines
 
