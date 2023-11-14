@@ -8,8 +8,8 @@ FROM $IMAGE
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
-ENV NGINX_VERSION   1.25.2
-ENV NJS_VERSION     0.8.0
+ENV NGINX_VERSION   1.25.3
+ENV NJS_VERSION     0.8.2
 ENV PKG_RELEASE     1~bookworm
 
 ARG UID=101
