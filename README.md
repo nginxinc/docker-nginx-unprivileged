@@ -20,11 +20,12 @@ Check out the [docs](https://hub.docker.com/_/nginx) for the upstream Docker NGI
 
 ### Image Registries
 
-You can find built images in the following registries:
+You can find pre-built images in the following registries:
 
 * Amazon ECR - <https://gallery.ecr.aws/nginx/nginx-unprivileged>
 * Docker Hub - <https://hub.docker.com/r/nginxinc/nginx-unprivileged>
 * GitHub Container Registry - <https://github.com/nginxinc/docker-nginx-unprivileged/pkgs/container/nginx-unprivileged>
+* Quay - <https://quay.io/repository/nginx/nginx-unprivileged>
 
 ### Architectures
 

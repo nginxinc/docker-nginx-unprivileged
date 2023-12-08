@@ -70,6 +70,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Quay
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
@@ -78,6 +85,7 @@ jobs:
             public.ecr.aws/nginx/nginx-unprivileged
             docker.io/nginxinc/nginx-unprivileged
             ghcr.io/nginxinc/nginx-unprivileged
+            quay.io/nginx/nginx-unprivileged
           tags: |
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-${{ needs.version.outputs.distro }}
@@ -171,6 +179,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Login to Quay
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
@@ -179,6 +194,7 @@ jobs:
             public.ecr.aws/nginx/nginx-unprivileged
             docker.io/nginxinc/nginx-unprivileged
             ghcr.io/nginxinc/nginx-unprivileged
+            quay.io/nginx/nginx-unprivileged
           tags: |
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-perl
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-${{ needs.version.outputs.distro }}-perl
