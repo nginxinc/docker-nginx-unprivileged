@@ -14,6 +14,12 @@ jobs:
       patch: ${{ steps.nginx_version.outputs.patch }}
       distro: ${{ steps.distro_version.outputs.release }}
     steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: Cleanup AWS ECR
         run: |
           REPOSITORY_NAME=nginx-unprivileged
@@ -30,10 +36,10 @@ jobs:
             --repository-name $REPOSITORY_NAME \
             --image-ids $IMAGE_DIGESTS \
             --dry-run
-        env:
-          aws-region: ${{ secrets.AWS_REGION }}
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        # env:
+        #   aws-region: ${{ secrets.AWS_REGION }}
+        #   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        #   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Check out the codebase
         uses: actions/checkout@v4
