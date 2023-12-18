@@ -14,6 +14,27 @@ jobs:
       patch: ${{ steps.nginx_version.outputs.patch }}
       distro: ${{ steps.distro_version.outputs.release }}
     steps:
+      - name: Cleanup AWS ECR
+        run: |
+          REPOSITORY_NAME=nginx-unprivileged
+
+          IMAGES=$(aws ecr-public describe-images \
+            --repository-name $REPOSITORY_NAME \
+            --region us-east-1 | jq -r .imageDetails)
+
+          UNTAGGED_IMAGES=$(jq -r 'map(select(has("imageTags") | not))' <<< $IMAGES)
+
+          IMAGE_DIGESTS=$(jq -r '[.[] | "imageDigest=\(.imageDigest)"] | join(" ")' <<< $UNTAGGED_IMAGES)
+
+          aws ecr-public batch-delete-image \
+            --repository-name $REPOSITORY_NAME \
+            --image-ids $IMAGE_DIGESTS \
+            --dry-run
+        env:
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       - name: Check out the codebase
         uses: actions/checkout@v4
 
