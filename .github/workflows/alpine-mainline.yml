@@ -26,7 +26,7 @@ jobs:
 
           IMAGE_DIGESTS=$(aws ecr-public describe-images \
           --max-items 100 \
-          --repository-name "${REPOSITORY_NAME}" \
+          --repository-name $REPOSITORY_NAME \
           --query 'imageDetails[?!imageTags && (contains(imageManifestMediaType, `manifest.list.v2`) || contains(imageManifestMediaType, `image.index.v1`))].{imageDigest: join(`=`, [`imageDigest`, imageDigest])}' \
           --output text)
 
