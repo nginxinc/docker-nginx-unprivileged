@@ -23,7 +23,7 @@ jobs:
       - name: Cleanup AWS ECR
         run: |
           REPOSITORY_NAME=nginx-unprivileged
-          BATCH_DELETE_SIZE=1000
+          BATCH_DELETE_SIZE=100
           function batch_delete {
             while read -r batch; do
                 if [ -z "${batch}" ]; then
