@@ -34,8 +34,7 @@ jobs:
 
           aws ecr-public batch-delete-image \
             --repository-name $REPOSITORY_NAME \
-            --image-ids $IMAGE_DIGESTS \
-            --dry-run
+            --image-ids $IMAGE_DIGESTS
         # env:
         #   aws-region: ${{ secrets.AWS_REGION }}
         #   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
