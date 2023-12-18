@@ -46,7 +46,7 @@ jobs:
             --repository-name "${REPOSITORY_NAME}" \
             --query 'imageDetails[?!imageTags].{imageDigest: join(`=`, [`imageDigest`, imageDigest])}' \
             --output text)
-          batch_delete "${IMAGE_DIGESTS}
+          batch_delete "${IMAGE_DIGESTS}"
 
 
         #   REPOSITORY_NAME=nginx-unprivileged
