@@ -363,6 +363,9 @@ jobs:
       fail-fast: false
     needs: [slim, core, perl]
     steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v4
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
