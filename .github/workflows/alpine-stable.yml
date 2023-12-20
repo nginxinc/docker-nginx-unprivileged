@@ -29,6 +29,107 @@ jobs:
         run: |
           echo "release=$(cat update.sh | grep -m5 '\[stable\]=' | tail -n1 | cut -d"'" -f2)" >> "$GITHUB_OUTPUT"
 
+  slim:
+    name: Build Alpine NGINX stable slim Docker image
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+    needs: version
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to Quay
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            public.ecr.aws/nginx/nginx-unprivileged
+            docker.io/nginxinc/nginx-unprivileged
+            ghcr.io/nginxinc/nginx-unprivileged
+            quay.io/nginx/nginx-unprivileged
+          tags: |
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-slim
+            type=raw,value=stable-alpine-slim
+            type=raw,value=stable-alpine${{ needs.version.outputs.distro }}-slim
+
+      - name: Build and push NGINX stable slim Alpine image to Amazon ECR, Docker Hub and GitHub Container Registry
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
+          context: "{{ defaultContext }}:stable/alpine-slim"
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          # cache-from: type=gha,scope=stable-alpine-slim
+          # cache-to: type=gha,mode=min,scope=stable-alpine-slim
+
+      - name: Sign Docker Hub Manifest
+        run: |
+          set -ex
+          sudo apt update
+          sudo apt install -y notary
+          mkdir -p ~/.docker/trust/private
+          echo "$DOCKER_CONTENT_TRUST_REPOSITORY_KEY" > ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
+          chmod 0400 ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
+          docker trust key load ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key --name nginx
+          DIGEST=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".digest' | cut -d ':' -f2)
+          SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
+          export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged stable-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
+          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged stable-alpine${{ needs.version.outputs.distro }}-slim $SIZE --sha256 $DIGEST --publish --verbose
+        env:
+          DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
+          DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
+          DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+          NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+
   core:
     name: Build Alpine NGINX stable Docker image
     runs-on: ubuntu-22.04
@@ -231,22 +332,13 @@ jobs:
           DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
           NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
 
-  slim:
-    name: Build Alpine NGINX stable slim Docker image
+  cleanup:
+    name: Delete untagged Alpine NGINX stable Docker images on the Amazon ECR Public Gallery
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
-    needs: version
+    needs: [slim, core, perl]
     steps:
-      - name: Check out the codebase
-        uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -254,80 +346,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          registry-type: public
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Login to Quay
-        uses: docker/login-action@v3
-        with:
-          registry: quay.io
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_TOKEN }}
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            public.ecr.aws/nginx/nginx-unprivileged
-            docker.io/nginxinc/nginx-unprivileged
-            ghcr.io/nginxinc/nginx-unprivileged
-            quay.io/nginx/nginx-unprivileged
-          tags: |
-            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim
-            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim
-            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim
-            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-slim
-            type=raw,value=stable-alpine-slim
-            type=raw,value=stable-alpine${{ needs.version.outputs.distro }}-slim
-
-      - name: Build and push NGINX stable slim Alpine image to Amazon ECR, Docker Hub and GitHub Container Registry
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
-          context: "{{ defaultContext }}:stable/alpine-slim"
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          push: true
-          # cache-from: type=gha,scope=stable-alpine-slim
-          # cache-to: type=gha,mode=min,scope=stable-alpine-slim
-
-      - name: Sign Docker Hub Manifest
+      - name: Delete untagged Alpine NGINX stable Docker images on the Amazon ECR Public Gallery
         run: |
-          set -ex
-          sudo apt update
-          sudo apt install -y notary
-          mkdir -p ~/.docker/trust/private
-          echo "$DOCKER_CONTENT_TRUST_REPOSITORY_KEY" > ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
-          chmod 0400 ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key
-          docker trust key load ~/.docker/trust/private/$DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID.key --name nginx
-          DIGEST=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".digest' | cut -d ':' -f2)
-          SIZE=$(printf '${{ steps.build.outputs.metadata }}' | jq -r '."containerimage.descriptor".size')
-          export NOTARY_AUTH=$(printf "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | base64 -w0)
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim $SIZE --sha256 $DIGEST --publish --verbose
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged ${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-slim $SIZE --sha256 $DIGEST --publish --verbose
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged stable-alpine-slim $SIZE --sha256 $DIGEST --publish --verbose
-          notary -d ~/.docker/trust/ -s https://notary.docker.io addhash docker.io/nginxinc/nginx-unprivileged stable-alpine${{ needs.version.outputs.distro }}-slim $SIZE --sha256 $DIGEST --publish --verbose
-        env:
-          DOCKER_CONTENT_TRUST_REPOSITORY_KEY: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY }}
-          DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
-          DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
-          NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+          .github/workflows/scripts/delete-untagged-amazon-public-ecr-images.sh
