@@ -372,4 +372,4 @@ jobs:
 
       - name: Delete untagged Alpine NGINX mainline Docker images on the Amazon ECR Public Gallery
         run: |
-          ./scripts/delete-untagged-amazon-public-ecr-images.sh
+          .github/workflows/scripts/delete-untagged-amazon-public-ecr-images.sh
