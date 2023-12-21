@@ -2,7 +2,7 @@
 # vim:sw=2:ts=2:sts=2:et
 # Inspired by https://github.com/zeek/zeek/blob/master/ci/public-ecr-cleanup.sh
 
-set -exu
+set -eu
 
 REPOSITORY_NAME=nginx-unprivileged
 BATCH_DELETE_SIZE=100 # The max delete size allowed by the 'batch-delete-image' aws CLI command is 100
