@@ -98,7 +98,7 @@ jobs:
             type=raw,value=alpine-slim
             type=raw,value=alpine${{ needs.version.outputs.distro }}-slim
 
-      - name: Build and push NGINX mainline slim Alpine image to Amazon ECR, Docker Hub and GitHub Container Registry
+      - name: Build and push NGINX mainline slim Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
         uses: docker/build-push-action@v5
         with:
@@ -207,7 +207,7 @@ jobs:
             type=raw,value=alpine
             type=raw,value=alpine${{ needs.version.outputs.distro }}
 
-      - name: Build and push NGINX mainline Alpine image to Amazon ECR, Docker Hub, and GitHub Container Registry
+      - name: Build and push NGINX mainline Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
         uses: docker/build-push-action@v5
         with:
@@ -316,7 +316,7 @@ jobs:
             type=raw,value=alpine-perl
             type=raw,value=alpine${{ needs.version.outputs.distro }}-perl
 
-      - name: Build and push NGINX mainline perl Alpine image to Amazon ECR, Docker Hub, and GitHub Container Registry
+      - name: Build and push NGINX mainline perl Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
         uses: docker/build-push-action@v5
         with:

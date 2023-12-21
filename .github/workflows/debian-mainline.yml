@@ -98,7 +98,7 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ needs.version.outputs.distro }}
 
-      - name: Build and push NGINX mainline Debian image to Amazon ECR, Docker Hub, and GitHub Container Registry
+      - name: Build and push NGINX mainline Debian image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
         uses: docker/build-push-action@v5
         with:
@@ -207,7 +207,7 @@ jobs:
             type=raw,value=perl
             type=raw,value=${{ needs.version.outputs.distro }}-perl
 
-      - name: Build and push NGINX mainline perl Debian image to Amazon ECR, Docker Hub, and GitHub Container Registry
+      - name: Build and push NGINX mainline perl Debian image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
         uses: docker/build-push-action@v5
         with:
