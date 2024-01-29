@@ -98,7 +98,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/mips64le, linux/ppc64le, linux/s390x
+          platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:stable/debian"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -200,7 +200,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
-          context: "{{ defaultContext }}:mainline/debian-perl"
+          context: "{{ defaultContext }}:stable/debian-perl"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: true
