@@ -12,8 +12,8 @@ The following is a set of guidelines for contributing to the Docker Unprivileged
 
 [Code Guidelines](#code-guidelines)
 
+* [Docker NGINX Unprivileged Guidelines](#docker-nginx-unprivileged-guidelines)
 * [Git Guidelines](#git-guidelines)
-* [Ansible Guidelines](#ansible-guidelines)
 
 [Code of Conduct](https://github.com/nginxinc/docker-nginx-unprivileged/blob/main/CODE_OF_CONDUCT.md)
 
