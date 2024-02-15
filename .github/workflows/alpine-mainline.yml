@@ -403,3 +403,4 @@ jobs:
           package-name: nginx-unprivileged
           package-type: container
           delete-only-untagged-versions: true
+          min-versions-to-keep: 0
