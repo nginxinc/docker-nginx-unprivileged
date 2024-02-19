@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Delete
-        uses: stumpylog/image-cleaner-action/untagged
+        uses: stumpylog/image-cleaner-action/untagged@v0.5.0
         with:
           do_delete: false
           is_org: true
