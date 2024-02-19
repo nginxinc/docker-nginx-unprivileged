@@ -6,7 +6,47 @@ on:
     - cron: "0 0 * * 1"
   workflow_dispatch:
 jobs:
-  # version:
+  cleanup:
+    name: Delete untagged Alpine NGINX mainline Docker images on the Amazon ECR Public Gallery
+    # if: ${{ github.event_name != 'pull_request' }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+    # needs: [slim, core, perl]
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Delete
+        uses: stumpylog/image-cleaner-action/untagged
+        with:
+          do_delete: false
+          is_org: true
+          package_name: nginx-unprivileged
+          owner: nginxinc
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+      #   with:
+      #     aws-region: ${{ secrets.AWS_REGION }}
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      # - name: Delete untagged Alpine NGINX mainline Docker images on the Amazon ECR Public Gallery
+      #   run: |
+      #     .github/workflows/scripts/delete-untagged-amazon-public-ecr-images.sh
+
+      # - name: Delete untagged Alpine NGINX mainline Docker images on the GitHub Container Registry
+      #   uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
+      #   with:
+      #     package-name: nginx-unprivileged
+      #     package-type: container
+      #     delete-only-untagged-versions: true
+      #     min-versions-to-keep: 0
+
+
+          # version:
   #   name: Fetch NGINX mainline version
   #   runs-on: ubuntu-22.04
   #   outputs:
@@ -375,32 +415,3 @@ jobs:
   #         DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
   #         NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
 
-  cleanup:
-    name: Delete untagged Alpine NGINX mainline Docker images on the Amazon ECR Public Gallery
-    # if: ${{ github.event_name != 'pull_request' }}
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-    # needs: [slim, core, perl]
-    steps:
-      - name: Check out the codebase
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
-      #   with:
-      #     aws-region: ${{ secrets.AWS_REGION }}
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      # - name: Delete untagged Alpine NGINX mainline Docker images on the Amazon ECR Public Gallery
-      #   run: |
-      #     .github/workflows/scripts/delete-untagged-amazon-public-ecr-images.sh
-
-      - name: Delete untagged Alpine NGINX mainline Docker images on the GitHub Container Registry
-        uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
-        with:
-          package-name: nginx-unprivileged
-          package-type: container
-          delete-only-untagged-versions: true
-          min-versions-to-keep: 0
