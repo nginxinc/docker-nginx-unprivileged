@@ -113,7 +113,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           # push: ${{ github.event_name != 'pull_request' }}
-          outputs: ${{ github.event_name != 'pull_request' && 'type=registry' || 'type=docker,dest=/tmp/nginxslim.tar' }}
+          outputs: ${{ github.event_name != 'pull_request' && 'type=registry' || 'type=oci,dest=/tmp/nginxslim.tar' }}
           # cache-from: type=gha,scope=alpine-slim
           # cache-to: type=gha,mode=min,scope=alpine-slim
 
@@ -249,7 +249,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           # push: ${{ github.event_name != 'pull_request' }}
-          outputs: ${{ github.event_name != 'pull_request' && 'type=registry' || 'type=docker,dest=/tmp/nginxcore.tar' }}
+          outputs: ${{ github.event_name != 'pull_request' && 'type=registry' || 'type=oci,dest=/tmp/nginxcore.tar' }}
           # cache-from: type=gha,scope=debian-perl
           # cache-to: type=gha,mode=min,scope=debian-perl
 
@@ -385,7 +385,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: ${{ github.event_name != 'pull_request' }}
-          # outputs: ${{ github.event_name != 'pull_request' && 'type=registry' || 'type=docker,dest=/tmp/nginxslim.tar' }}
+          # outputs: ${{ github.event_name != 'pull_request' && 'type=registry' || 'type=oci,dest=/tmp/nginxslim.tar' }}
           # cache-from: type=gha,scope=alpine-perl
           # cache-to: type=gha,mode=min,scope=alpine-perl
 
