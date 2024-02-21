@@ -112,9 +112,18 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine-slim"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: ${{ github.event_name != 'pull_request' }}
+          # push: ${{ github.event_name != 'pull_request' }}
+          outputs: ${{ github.event_name != 'pull_request' && 'type=registry' || 'type=docker,dest=/tmp/nginxslim.tar' }}
           # cache-from: type=gha,scope=alpine-slim
           # cache-to: type=gha,mode=min,scope=alpine-slim
+
+      - name: Upload Docker build artifact during local builds
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: nginxslim
+          path: /tmp/nginxslim.tar
+          retention-days: 1
 
       - name: Sign Docker Hub Manifest
         if: ${{ github.event_name != 'pull_request' }}
@@ -219,6 +228,18 @@ jobs:
             type=raw,value=alpine
             type=raw,value=alpine${{ needs.version.outputs.distro }}
 
+      - name: Download artifact
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4.1.2
+        with:
+          name: nginxslim
+          path: /tmp
+
+      - name: Load image
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          docker load --input /tmp/nginxslim.tar
+
       - name: Build and push NGINX mainline Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
         uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # v5.1.0
@@ -227,9 +248,18 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          push: ${{ github.event_name != 'pull_request' }}
+          # push: ${{ github.event_name != 'pull_request' }}
+          outputs: ${{ github.event_name != 'pull_request' && 'type=registry' || 'type=docker,dest=/tmp/nginxcore.tar' }}
           # cache-from: type=gha,scope=debian-perl
           # cache-to: type=gha,mode=min,scope=debian-perl
+
+      - name: Upload Docker build artifact during local builds
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: nginxcore
+          path: /tmp/nginxcore.tar
+          retention-days: 1
 
       - name: Sign Docker Hub Manifest
         if: ${{ github.event_name != 'pull_request' }}
@@ -334,6 +364,18 @@ jobs:
             type=raw,value=alpine-perl
             type=raw,value=alpine${{ needs.version.outputs.distro }}-perl
 
+      - name: Download artifact
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4.1.2
+        with:
+          name: nginxcore
+          path: /tmp
+
+      - name: Load image
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          docker load --input /tmp/nginxcore.tar
+
       - name: Build and push NGINX mainline perl Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
         uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # v5.1.0
@@ -343,6 +385,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: ${{ github.event_name != 'pull_request' }}
+          # outputs: ${{ github.event_name != 'pull_request' && 'type=registry' || 'type=docker,dest=/tmp/nginxslim.tar' }}
           # cache-from: type=gha,scope=alpine-perl
           # cache-to: type=gha,mode=min,scope=alpine-perl
 
