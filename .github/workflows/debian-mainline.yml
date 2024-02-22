@@ -261,7 +261,7 @@ jobs:
           NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
 
   cleanup:
-    name: Delete untagged Debian NGINX mainline Docker images on the Amazon ECR Public Gallery
+    name: Delete untagged Debian NGINX mainline Docker images on the Amazon ECR Public Gallery and the GitHub Container Registry
     if: ${{ github.event_name != 'pull_request' }}
     runs-on: ubuntu-22.04
     strategy:
@@ -281,3 +281,11 @@ jobs:
       - name: Delete untagged Debian NGINX mainline Docker images on the Amazon ECR Public Gallery
         run: |
           .github/workflows/scripts/delete-untagged-amazon-public-ecr-images.sh
+
+      - name: Delete untagged Debian NGINX mainline Docker images on the GitHub Container Registry
+        uses: stumpylog/image-cleaner-action/untagged@9255a1b3b8ca44b3e5887e2168155223b277ca1d # v0.5.0
+        with:
+          is_org: true
+          owner: nginxinc
+          package_name: nginx-unprivileged
+          token: ${{ secrets.GITHUB_TOKEN }}
