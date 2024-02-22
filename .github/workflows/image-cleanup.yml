@@ -33,4 +33,5 @@ jobs:
           is_org: true
           owner: nginxinc
           package_name: nginx-unprivileged
+          do_delete: true
           token: ${{ secrets.GITHUB_TOKEN }}
