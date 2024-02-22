@@ -19,18 +19,18 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
-            aws-region: ${{ secrets.AWS_REGION }}
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Delete untagged NGINX Unprivileged Docker images on the Amazon ECR Public Gallery
         run: |
-            .github/workflows/scripts/delete-untagged-amazon-public-ecr-images.sh
+          .github/workflows/scripts/delete-untagged-amazon-public-ecr-images.sh
 
       - name: Delete untagged NGINX Unprivileged Docker images on the GitHub Container Registry
         uses: stumpylog/image-cleaner-action/untagged@9255a1b3b8ca44b3e5887e2168155223b277ca1d # v0.5.0
         with:
-            is_org: true
-            owner: nginxinc
-            package_name: nginx-unprivileged
-            token: ${{ secrets.GITHUB_TOKEN }}
+          is_org: true
+          owner: nginxinc
+          package_name: nginx-unprivileged
+          token: ${{ secrets.GITHUB_TOKEN }}
