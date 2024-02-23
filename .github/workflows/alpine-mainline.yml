@@ -100,6 +100,8 @@ jobs:
             type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}-slim
             type=raw,value=alpine-slim
             type=raw,value=alpine${{ needs.version.outputs.distro }}-slim
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
 
       - name: Build and push NGINX mainline slim Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
