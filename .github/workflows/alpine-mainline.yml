@@ -92,16 +92,16 @@ jobs:
           images: |
             ghcr.io/nginxinc/nginx-unprivileged
           tags: |
-            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim
-            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim
-            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim
-            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-slim
-            type=raw,value=${{ needs.version.outputs.major }}-alpine-slim
-            type=raw,value=${{ needs.version.outputs.major }}-alpine${{ needs.version.outputs.distro }}-slim
-            type=raw,value=mainline-alpine-slim
-            type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}-slim
-            type=raw,value=alpine-slim
-            type=raw,value=alpine${{ needs.version.outputs.distro }}-slim
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}-alpine-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}-alpine${{ needs.version.outputs.distro }}-slim-test
+            type=raw,value=mainline-alpine-slim-test
+            type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}-slim-test
+            type=raw,value=alpine-slim-test
+            type=raw,value=alpine${{ needs.version.outputs.distro }}-slim-test
 
       - name: Build and push NGINX mainline slim Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
