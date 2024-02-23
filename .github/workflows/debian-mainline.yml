@@ -32,10 +32,10 @@ jobs:
 
   core:
     name: Build Debian NGINX mainline Docker image
+    needs: version
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
-    needs: version
     steps:
       - name: Check out the codebase
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -83,7 +83,7 @@ jobs:
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata (annotations, labels, tags) for Docker
         id: meta
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
@@ -103,6 +103,8 @@ jobs:
             type=raw,value=mainline-${{ needs.version.outputs.distro }}
             type=raw,value=latest
             type=raw,value=${{ needs.version.outputs.distro }}
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
 
       - name: Build and push NGINX mainline Debian image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
@@ -110,8 +112,9 @@ jobs:
         with:
           platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/debian"
-          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          tags: ${{ steps.meta.outputs.tags }}
           push: ${{ github.event_name != 'pull_request' }}
           # cache-from: type=gha,scope=debian-perl
           # cache-to: type=gha,mode=min,scope=debian-perl
@@ -147,10 +150,10 @@ jobs:
 
   perl:
     name: Build Debian NGINX mainline perl Docker image
+    needs: [version, core]
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
-    needs: [version, core]
     steps:
       - name: Check out the codebase
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -198,7 +201,7 @@ jobs:
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata (annotations, labels, tags) for Docker
         id: meta
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
@@ -218,6 +221,8 @@ jobs:
             type=raw,value=mainline-${{ needs.version.outputs.distro }}-perl
             type=raw,value=perl
             type=raw,value=${{ needs.version.outputs.distro }}-perl
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
 
       - name: Build and push NGINX mainline perl Debian image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
@@ -225,8 +230,9 @@ jobs:
         with:
           platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/debian-perl"
-          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          tags: ${{ steps.meta.outputs.tags }}
           push: ${{ github.event_name != 'pull_request' }}
           # cache-from: type=gha,scope=debian-perl
           # cache-to: type=gha,mode=min,scope=debian-perl
