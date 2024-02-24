@@ -32,10 +32,10 @@ jobs:
 
   slim:
     name: Build Alpine NGINX mainline slim Docker image
+    needs: version
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
-    needs: version
     steps:
       - name: Check out the codebase
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -83,15 +83,12 @@ jobs:
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata (annotations, labels, tags) for Docker
         id: meta
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
           images: |
-            docker.io/nginxinc/nginx-unprivileged
             ghcr.io/nginxinc/nginx-unprivileged
-            public.ecr.aws/nginx/nginx-unprivileged
-            quay.io/nginx/nginx-unprivileged
           tags: |
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim
@@ -103,6 +100,8 @@ jobs:
             type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}-slim
             type=raw,value=alpine-slim
             type=raw,value=alpine${{ needs.version.outputs.distro }}-slim
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
 
       - name: Build and push NGINX mainline slim Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
@@ -110,8 +109,9 @@ jobs:
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-slim"
-          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          tags: ${{ steps.meta.outputs.tags }}
           push: ${{ github.event_name != 'pull_request' }}
           # cache-from: type=gha,scope=alpine-slim
           # cache-to: type=gha,mode=min,scope=alpine-slim
@@ -147,10 +147,10 @@ jobs:
 
   core:
     name: Build Alpine NGINX mainline Docker image
+    needs: [version, slim]
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
-    needs: [version, slim]
     steps:
       - name: Check out the codebase
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -198,7 +198,7 @@ jobs:
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata (annotations, labels, tags) for Docker
         id: meta
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
@@ -218,6 +218,8 @@ jobs:
             type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}
             type=raw,value=alpine
             type=raw,value=alpine${{ needs.version.outputs.distro }}
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
 
       - name: Build and push NGINX mainline Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
@@ -225,8 +227,9 @@ jobs:
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine"
-          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          tags: ${{ steps.meta.outputs.tags }}
           push: ${{ github.event_name != 'pull_request' }}
           # cache-from: type=gha,scope=debian-perl
           # cache-to: type=gha,mode=min,scope=debian-perl
@@ -262,10 +265,10 @@ jobs:
 
   perl:
     name: Build Alpine NGINX mainline perl Docker image
+    needs: [version, core]
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
-    needs: [version, core]
     steps:
       - name: Check out the codebase
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -313,7 +316,7 @@ jobs:
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata (annotations, labels, tags) for Docker
         id: meta
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
@@ -333,6 +336,8 @@ jobs:
             type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}-perl
             type=raw,value=alpine-perl
             type=raw,value=alpine${{ needs.version.outputs.distro }}-perl
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
 
       - name: Build and push NGINX mainline perl Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
@@ -340,8 +345,9 @@ jobs:
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-perl"
-          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          tags: ${{ steps.meta.outputs.tags }}
           push: ${{ github.event_name != 'pull_request' }}
           # cache-from: type=gha,scope=alpine-perl
           # cache-to: type=gha,mode=min,scope=alpine-perl
@@ -374,3 +380,33 @@ jobs:
           DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_KEY_ID }}
           DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
           NOTARY_TARGETS_PASSPHRASE: ${{ secrets.DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE }}
+
+  cleanup:
+    name: Delete untagged Alpine NGINX mainline Docker images on the Amazon ECR Public Gallery and the GitHub Container Registry
+    if: ${{ github.event_name != 'pull_request' }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+    needs: [slim, core, perl]
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Delete untagged Alpine NGINX mainline Docker images on the Amazon ECR Public Gallery
+        run: |
+          .github/workflows/scripts/delete-untagged-amazon-public-ecr-images.sh
+
+      - name: Delete untagged Alpine NGINX mainline Docker images on the GitHub Container Registry
+        uses: stumpylog/image-cleaner-action/untagged@9255a1b3b8ca44b3e5887e2168155223b277ca1d # v0.5.0
+        with:
+          is_org: true
+          owner: nginxinc
+          package_name: nginx-unprivileged
+          token: ${{ secrets.GITHUB_TOKEN }}
