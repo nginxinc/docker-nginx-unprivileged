@@ -85,7 +85,7 @@ jobs:
       #     username: ${{ secrets.QUAY_USERNAME }}
       #     password: ${{ secrets.QUAY_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata (annotations, labels, tags) for Docker
         id: meta
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         # with:
@@ -152,7 +152,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata (annotations, labels, tags) for Docker
         id: meta
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
