@@ -8,7 +8,7 @@ on:
 jobs:
   cleanup:
     name: Delete untagged NGINX Unprivileged Docker images on the Amazon ECR Public Gallery and the GitHub Container Registry
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
