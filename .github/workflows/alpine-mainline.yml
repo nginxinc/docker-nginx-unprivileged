@@ -88,21 +88,21 @@ jobs:
       - name: Extract metadata (annotations, labels, tags) for Docker
         id: meta
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
-        # with:
-          # images: |
-          #   docker.io/nginxinc/nginx-unprivileged
-          #   ghcr.io/nginxinc/nginx-unprivileged
-          # tags: |
-          #   type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim-test
-          #   type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim-test
-          #   type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim-test
-          #   type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-slim-test
-          #   type=raw,value=${{ needs.version.outputs.major }}-alpine-slim-test
-          #   type=raw,value=${{ needs.version.outputs.major }}-alpine${{ needs.version.outputs.distro }}-slim-test
-          #   type=raw,value=mainline-alpine-slim-test
-          #   type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}-slim-test
-          #   type=raw,value=alpine-slim-test
-          #   type=raw,value=alpine${{ needs.version.outputs.distro }}-slim-test
+        with:
+          images: |
+            docker.io/nginxinc/nginx-unprivileged
+            ghcr.io/nginxinc/nginx-unprivileged
+          tags: |
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}-alpine-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}-alpine${{ needs.version.outputs.distro }}-slim-test
+            type=raw,value=mainline-alpine-slim-test
+            type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}-slim-test
+            type=raw,value=alpine-slim-test
+            type=raw,value=alpine${{ needs.version.outputs.distro }}-slim-test
 
       - name: Build and push NGINX mainline slim Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
@@ -110,9 +110,9 @@ jobs:
         with:
           platforms: ${{ matrix.platform }}
           context: "{{ defaultContext }}:mainline/alpine-slim"
-          # tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=""docker.io/nginxinc/nginx-unprivileged,ghcr.io/nginxinc/nginx-unprivileged"",push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
           # push: ${{ github.event_name != 'pull_request' }}
           # cache-from: type=gha,scope=alpine-slim
           # cache-to: type=gha,mode=min,scope=alpine-slim
