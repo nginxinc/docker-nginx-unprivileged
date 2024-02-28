@@ -112,7 +112,7 @@ jobs:
           context: "{{ defaultContext }}:mainline/alpine-slim"
           # tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=docker.io/nginxinc/nginx-unprivileged,ghcr.io/nginxinc/nginx-unprivileged,push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name='docker.io/nginxinc/nginx-unprivileged,ghcr.io/nginxinc/nginx-unprivileged',push-by-digest=true,name-canonical=true,push=true
           # push: ${{ github.event_name != 'pull_request' }}
           # cache-from: type=gha,scope=alpine-slim
           # cache-to: type=gha,mode=min,scope=alpine-slim
