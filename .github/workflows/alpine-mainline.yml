@@ -187,6 +187,7 @@ jobs:
       - name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
+          set -x
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") $(printf 'ghcr.io/nginxinc/nginx-unprivileged@sha256:%s ' *)
 
       - name: Extract metadata (annotations, labels, tags) for Docker
@@ -194,7 +195,7 @@ jobs:
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
           images: |
-            docker.io/nginxinc/nginx-unprivileged
+            nginxinc/nginx-unprivileged
           tags: |
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim-test
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim-test
@@ -210,12 +211,13 @@ jobs:
       - name: Create manifest list and push 2
         working-directory: /tmp/digests
         run: |
+          set -x
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") ghcr.io/nginxinc/nginx-unprivileged:alpine-slim-test
 
       - name: Inspect image
         run: |
           docker buildx imagetools inspect ghcr.io/nginxinc/nginx-unprivileged:alpine-slim-test
-          docker buildx imagetools inspect docker.io/nginxinc/nginx-unprivileged:alpine-slim-test
+          docker buildx imagetools inspect nginxinc/nginx-unprivileged:alpine-slim-test
 
       # - name: Sign Docker Hub Manifest
       #   if: ${{ github.event_name != 'pull_request' }}
