@@ -90,7 +90,6 @@ jobs:
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
           images: |
-            docker.io/nginxinc/nginx-unprivileged
             ghcr.io/nginxinc/nginx-unprivileged
           tags: |
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim-test
@@ -157,8 +156,7 @@ jobs:
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
           images: |
-            # ghcr.io/nginxinc/nginx-unprivileged
-            docker.io/nginxinc/nginx-unprivileged
+            ghcr.io/nginxinc/nginx-unprivileged
           tags: |
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim-test
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim-test
@@ -191,10 +189,33 @@ jobs:
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") $(printf 'ghcr.io/nginxinc/nginx-unprivileged@sha256:%s ' *)
 
+      - name: Extract metadata (annotations, labels, tags) for Docker
+        id: meta2
+        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
+        with:
+          images: |
+            docker.io/nginxinc/nginx-unprivileged
+          tags: |
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}-alpine-slim-test
+            type=raw,value=${{ needs.version.outputs.major }}-alpine${{ needs.version.outputs.distro }}-slim-test
+            type=raw,value=mainline-alpine-slim-test
+            type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}-slim-test
+            type=raw,value=alpine-slim-test
+            type=raw,value=alpine${{ needs.version.outputs.distro }}-slim-test
+
+      - name: Create manifest list and push 2
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") ghcr.io/nginxinc/nginx-unprivileged:alpine-slim-test
+
       - name: Inspect image
         run: |
-          docker buildx imagetools inspect ghcr.io/nginxinc/nginx-unprivileged:${{ steps.meta.outputs.version }}
-          docker buildx imagetools inspect docker.io/nginxinc/nginx-unprivileged:${{ steps.meta.outputs.version }}
+          docker buildx imagetools inspect ghcr.io/nginxinc/nginx-unprivileged:alpine-slim-test
+          docker buildx imagetools inspect docker.io/nginxinc/nginx-unprivileged:alpine-slim-test
 
       # - name: Sign Docker Hub Manifest
       #   if: ${{ github.event_name != 'pull_request' }}
