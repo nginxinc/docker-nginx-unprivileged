@@ -151,7 +151,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          version: https://github.com/docker/buildx.git#5723ceefb6a52e16339acfed86871ffdabf240a7
+          version: https://github.com/docker/buildx.git#e273a53c88832df6dceebd727a259cae2fd5be88
 
       - name: Extract metadata (annotations, labels, tags) for Docker
         id: meta
