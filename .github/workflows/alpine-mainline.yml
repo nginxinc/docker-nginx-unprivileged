@@ -64,20 +64,20 @@ jobs:
       #   with:
       #     registry: public.ecr.aws
 
-      - name: Login to Docker Hub
-        # if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      # - name: Login to GitHub Container Registry
+      # - name: Login to Docker Hub
       #   # if: ${{ github.event_name != 'pull_request' }}
       #   uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
       #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.actor }}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        # if: ${{ github.event_name != 'pull_request' }}
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # - name: Login to Quay
       #   if: ${{ github.event_name != 'pull_request' }}
@@ -92,7 +92,7 @@ jobs:
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
           images: |
-            docker.io/nginxinc/nginx-unprivileged
+            ghcr.io/nginxinc/nginx-unprivileged
           tags: |
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim-test
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim-test
@@ -107,13 +107,13 @@ jobs:
 
       - name: Build and push NGINX mainline slim Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
-        uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # v5.1.0
+        uses: docker/build-push-action@af5a7ed5ba88268d5278f7203fb52cd833f66d6e # v5.2.0
         with:
           platforms: ${{ matrix.platform }}
           context: "{{ defaultContext }}:mainline/alpine-slim"
           # tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=docker.io/nginxinc/nginx-unprivileged,push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,"name=ghcr.io/nginxinc/nginx-unprivileged,docker.io/nginxinc/nginx-unprivileged",push-by-digest=true,name-canonical=true,push=true
           # push: ${{ github.event_name != 'pull_request' }}
           # cache-from: type=gha,scope=alpine-slim
           # cache-to: type=gha,mode=min,scope=alpine-slim
@@ -160,6 +160,7 @@ jobs:
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
           images: |
+            ghcr.io/nginxinc/nginx-unprivileged
             docker.io/nginxinc/nginx-unprivileged
           tags: |
             type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim-test
@@ -192,31 +193,31 @@ jobs:
         working-directory: /tmp/digests
         run: |
           set -x
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") $(printf 'docker.io/nginxinc/nginx-unprivileged@sha256:%s ' *)
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") $(printf 'ghcr.io/nginxinc/nginx-unprivileged@sha256:%s ' *)
 
-      - name: Extract metadata (annotations, labels, tags) for Docker
-        id: meta2
-        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
-        with:
-          images: |
-            ghcr.io/nginxinc/nginx-unprivileged
-          tags: |
-            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim-test
-            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim-test
-            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim-test
-            type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-slim-test
-            type=raw,value=${{ needs.version.outputs.major }}-alpine-slim-test
-            type=raw,value=${{ needs.version.outputs.major }}-alpine${{ needs.version.outputs.distro }}-slim-test
-            type=raw,value=mainline-alpine-slim-test
-            type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}-slim-test
-            type=raw,value=alpine-slim-test
-            type=raw,value=alpine${{ needs.version.outputs.distro }}-slim-test
+      # - name: Extract metadata (annotations, labels, tags) for Docker
+      #   id: meta2
+      #   uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
+      #   with:
+      #     images: |
+      #       ghcr.io/nginxinc/nginx-unprivileged
+      #     tags: |
+      #       type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine-slim-test
+      #       type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}.${{ needs.version.outputs.patch }}-alpine${{ needs.version.outputs.distro }}-slim-test
+      #       type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine-slim-test
+      #       type=raw,value=${{ needs.version.outputs.major }}.${{ needs.version.outputs.minor }}-alpine${{ needs.version.outputs.distro }}-slim-test
+      #       type=raw,value=${{ needs.version.outputs.major }}-alpine-slim-test
+      #       type=raw,value=${{ needs.version.outputs.major }}-alpine${{ needs.version.outputs.distro }}-slim-test
+      #       type=raw,value=mainline-alpine-slim-test
+      #       type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}-slim-test
+      #       type=raw,value=alpine-slim-test
+      #       type=raw,value=alpine${{ needs.version.outputs.distro }}-slim-test
 
-      - name: Create manifest list and push 2
-        working-directory: /tmp/digests
-        run: |
-          set -x
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") docker.io/nginxinc/nginx-unprivileged:alpine-slim-test
+      # - name: Create manifest list and push 2
+      #   working-directory: /tmp/digests
+      #   run: |
+      #     set -x
+      #     docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") docker.io/nginxinc/nginx-unprivileged:alpine-slim-test
 
       - name: Inspect image
         run: |
