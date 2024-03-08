@@ -222,7 +222,7 @@ jobs:
       - name: Inspect image
         run: |
           docker buildx imagetools inspect ghcr.io/nginxinc/nginx-unprivileged:alpine-slim-test
-          docker buildx imagetools inspect docker.io/nginx-unprivileged:alpine-slim-test
+          docker buildx imagetools inspect docker.io/nginxinc/nginx-unprivileged:alpine-slim-test
 
       # - name: Sign Docker Hub Manifest
       #   if: ${{ github.event_name != 'pull_request' }}
