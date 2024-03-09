@@ -193,7 +193,9 @@ jobs:
         working-directory: /tmp/digests
         run: |
           set -x
-          docker buildx imagetools create $(jq -cr '.annotations | map((split("=")[0] + "=\"" + split("=")[1] + "\"") | "--annotation " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") $(printf 'ghcr.io/nginxinc/nginx-unprivileged@sha256:%s ' *)
+          annotations=$(jq -cr '.annotations | map((split("=")[0] + "=\"" + split("=")[1] + "\"") | "--annotation " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
+          tags=$(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
+          docker buildx imagetools create $(cat $annotations) $(cat $tags) $(printf 'ghcr.io/nginxinc/nginx-unprivileged@sha256:%s ' *)
 
       - name: Inspect image
         run: |
