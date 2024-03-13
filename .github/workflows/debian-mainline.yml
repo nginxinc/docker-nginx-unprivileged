@@ -1,7 +1,7 @@
 ---
 name: Debian Mainline
 on:
-  pull_request:
+  # pull_request:
   schedule:
     - cron: "0 0 * * 1"
   workflow_dispatch:
