@@ -173,6 +173,8 @@ jobs:
             type=raw,value=mainline-alpine${{ needs.version.outputs.distro }}-slim-test
             type=raw,value=alpine-slim-test
             type=raw,value=alpine${{ needs.version.outputs.distro }}-slim-test
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: index
 
       - name: Login to Docker Hub
         # if: ${{ github.event_name != 'pull_request' }}
@@ -195,7 +197,7 @@ jobs:
           set -x
           annotations=$(jq -cr '.annotations | map((split("=")[0] + "=\"" + split("=")[1] + "\"") | "--annotation " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
           tags=$(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
-          docker buildx imagetools create $annotations $tags $(printf 'ghcr.io/nginxinc/nginx-unprivileged@sha256:%s ' *)
+          eval "docker buildx imagetools create $annotations $tags $(printf 'ghcr.io/nginxinc/nginx-unprivileged@sha256:%s ' *)"
 
       - name: Inspect image
         run: |
