@@ -3,10 +3,11 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-ARG IMAGE=nginxinc/nginx-unprivileged:1.24.0-alpine-slim
+ARG IMAGE=nginxinc/nginx-unprivileged:1.26.0-alpine-slim
 FROM $IMAGE
 
-ENV NJS_VERSION   0.8.0
+ENV NJS_VERSION   0.8.4
+ENV NJS_RELEASE   1
 
 ARG UID=101
 ARG GID=101
@@ -20,7 +21,7 @@ RUN set -x \
         nginx-module-xslt=${NGINX_VERSION}-r${PKG_RELEASE} \
         nginx-module-geoip=${NGINX_VERSION}-r${PKG_RELEASE} \
         nginx-module-image-filter=${NGINX_VERSION}-r${PKG_RELEASE} \
-        nginx-module-njs=${NGINX_VERSION}.${NJS_VERSION}-r${PKG_RELEASE} \
+        nginx-module-njs=${NGINX_VERSION}.${NJS_VERSION}-r${NJS_RELEASE} \
     " \
 # install prerequisites for public key and pkg-oss checks
     && apk add --no-cache --virtual .checksum-deps \
@@ -28,17 +29,7 @@ RUN set -x \
     && case "$apkArch" in \
         x86_64|aarch64) \
 # arches officially built by upstream
-            set -x \
-            && KEY_SHA512="e09fa32f0a0eab2b879ccbbc4d0e4fb9751486eedda75e35fac65802cc9faa266425edf83e261137a2f4d16281ce2c1a5f4502930fe75154723da014214f0655" \
-            && wget -O /tmp/nginx_signing.rsa.pub https://nginx.org/keys/nginx_signing.rsa.pub \
-            && if echo "$KEY_SHA512 */tmp/nginx_signing.rsa.pub" | sha512sum -c -; then \
-                echo "key verification succeeded!"; \
-                mv /tmp/nginx_signing.rsa.pub /etc/apk/keys/; \
-            else \
-                echo "key verification failed!"; \
-                exit 1; \
-            fi \
-            && apk add -X "https://nginx.org/packages/alpine/v$(egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release)/main" --no-cache $nginxPackages \
+            apk add -X "https://nginx.org/packages/alpine/v$(egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release)/main" --no-cache $nginxPackages \
             ;; \
         *) \
 # we're on an architecture upstream doesn't officially build for
@@ -64,16 +55,16 @@ RUN set -x \
             && su nobody -s /bin/sh -c " \
                 export HOME=${tempDir} \
                 && cd ${tempDir} \
-                && curl -f -O https://hg.nginx.org/pkg-oss/archive/e5d85b3424bb.tar.gz \
-                && PKGOSSCHECKSUM=\"4f33347bf05e7d7dd42a52b6e7af7ec21e3ed71df05a8ec16dd1228425f04e4318d88b1340370ccb6ad02cde590fc102094ddffbb1fc86d2085295a43f02f67b *e5d85b3424bb.tar.gz\" \
-                && if [ \"\$(openssl sha512 -r e5d85b3424bb.tar.gz)\" = \"\$PKGOSSCHECKSUM\" ]; then \
+                && curl -f -O https://hg.nginx.org/pkg-oss/archive/${NGINX_VERSION}-${PKG_RELEASE}.tar.gz \
+                && PKGOSSCHECKSUM=\"f0ee7cef9a6e4aa1923177eb2782577ce61837c22c59bd0c3bd027a0a4dc3a3cdc4a16e95480a075bdee32ae59c0c6385dfadb971f93931fea84976c4a21fceb *${NGINX_VERSION}-${PKG_RELEASE}.tar.gz\" \
+                && if [ \"\$(openssl sha512 -r ${NGINX_VERSION}-${PKG_RELEASE}.tar.gz)\" = \"\$PKGOSSCHECKSUM\" ]; then \
                     echo \"pkg-oss tarball checksum verification succeeded!\"; \
                 else \
                     echo \"pkg-oss tarball checksum verification failed!\"; \
                     exit 1; \
                 fi \
-                && tar xzvf e5d85b3424bb.tar.gz \
-                && cd pkg-oss-e5d85b3424bb \
+                && tar xzvf ${NGINX_VERSION}-${PKG_RELEASE}.tar.gz \
+                && cd pkg-oss-${NGINX_VERSION}-${PKG_RELEASE} \
                 && cd alpine \
                 && make module-geoip module-image-filter module-njs module-xslt \
                 && apk index -o ${tempDir}/packages/alpine/${apkArch}/APKINDEX.tar.gz ${tempDir}/packages/alpine/${apkArch}/*.apk \
@@ -87,9 +78,8 @@ RUN set -x \
 # remove checksum deps
     && apk del --no-network .checksum-deps \
 # if we have leftovers from building, let's purge them (including extra, unnecessary build deps)
-    && if [ -f "$tempDir" ]; then rm -rf "$tempDir"; fi \
-    && if [ -n "/etc/apk/keys/abuild-key.rsa.pub" ]; then rm -f /etc/apk/keys/abuild-key.rsa.pub; fi \
-    && if [ -n "/etc/apk/keys/nginx_signing.rsa.pub" ]; then rm -f /etc/apk/keys/nginx_signing.rsa.pub; fi \
+    && if [ -n "$tempDir" ]; then rm -rf "$tempDir"; fi \
+    && if [ -f "/etc/apk/keys/abuild-key.rsa.pub" ]; then rm -f /etc/apk/keys/abuild-key.rsa.pub; fi \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
     && apk add --no-cache curl ca-certificates
 

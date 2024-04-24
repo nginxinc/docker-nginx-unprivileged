@@ -3,14 +3,15 @@
 #
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
-ARG IMAGE=debian:bullseye-slim
+ARG IMAGE=debian:bookworm-slim
 FROM $IMAGE
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
-ENV NGINX_VERSION   1.24.0
-ENV NJS_VERSION     0.8.0
-ENV PKG_RELEASE     1~bullseye
+ENV NGINX_VERSION   1.26.0
+ENV NJS_VERSION     0.8.4
+ENV NJS_RELEASE     1~bookworm
+ENV PKG_RELEASE     1~bookworm
 
 ARG UID=101
 ARG GID=101
@@ -23,7 +24,7 @@ RUN set -x \
     && apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
     && \
     NGINX_GPGKEY=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62; \
-    NGINX_GPGKEY_PATH=/usr/share/keyrings/nginx-archive-keyring.gpg; \
+    NGINX_GPGKEY_PATH=/etc/apt/keyrings/nginx-archive-keyring.gpg; \
     export GNUPGHOME="$(mktemp -d)"; \
     found=''; \
     for server in \
@@ -43,18 +44,18 @@ RUN set -x \
         nginx-module-xslt=${NGINX_VERSION}-${PKG_RELEASE} \
         nginx-module-geoip=${NGINX_VERSION}-${PKG_RELEASE} \
         nginx-module-image-filter=${NGINX_VERSION}-${PKG_RELEASE} \
-        nginx-module-njs=${NGINX_VERSION}+${NJS_VERSION}-${PKG_RELEASE} \
+        nginx-module-njs=${NGINX_VERSION}+${NJS_VERSION}-${NJS_RELEASE} \
     " \
     && case "$dpkgArch" in \
         amd64|arm64) \
 # arches officialy built by upstream
-            echo "deb [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/debian/ bullseye nginx" >> /etc/apt/sources.list.d/nginx.list \
+            echo "deb [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/debian/ bookworm nginx" >> /etc/apt/sources.list.d/nginx.list \
             && apt-get update \
             ;; \
         *) \
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published source packages
-            echo "deb-src [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/debian/ bullseye nginx" >> /etc/apt/sources.list.d/nginx.list \
+            echo "deb-src [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/debian/ bookworm nginx" >> /etc/apt/sources.list.d/nginx.list \
             \
 # new directory for storing sources and .deb files
             && tempDir="$(mktemp -d)" \
