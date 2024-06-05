@@ -14,8 +14,7 @@ RUN set -x \
     && addgroup -g $GID -S nginx || true \
     && adduser -S -D -H -u $UID -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx || true \
     && apkArch="$(cat /etc/apk/arch)" \
-    && nginxPackages="%%PACKAGES%%
-    " \
+    && nginxPackages="%%PACKAGES%%" \
 # install prerequisites for public key and pkg-oss checks
     && apk add --no-cache --virtual .checksum-deps \
         openssl \
