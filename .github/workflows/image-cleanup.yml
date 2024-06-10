@@ -28,7 +28,7 @@ jobs:
           .github/workflows/scripts/delete-untagged-amazon-public-ecr-images.sh
 
       - name: Delete untagged NGINX Unprivileged Docker images on the GitHub Container Registry
-        uses: stumpylog/image-cleaner-action/untagged@0c9e57eef74b24c7b41f98f73dcb404eb58b2fab # v0.6.0
+        uses: stumpylog/image-cleaner-action/untagged@f39c67c8ba6953b856f32dca2b5be0567497fa67 # v0.7.0
         with:
           is_org: true
           owner: nginxinc
