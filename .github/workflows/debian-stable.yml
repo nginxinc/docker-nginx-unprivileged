@@ -106,7 +106,8 @@ jobs:
         id: build
         uses: docker/build-push-action@16ebe778df0e7752d2cfcbd924afdbbd89c1a755 # v6.6.1
         with:
-          platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
+          platforms: linux/amd64, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
+          # platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:stable/debian"
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
@@ -216,7 +217,8 @@ jobs:
         id: build
         uses: docker/build-push-action@16ebe778df0e7752d2cfcbd924afdbbd89c1a755 # v6.6.1
         with:
-          platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
+          platforms: linux/amd64, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
+          # platforms: linux/amd64, linux/arm/v5, linux/arm/v7, linux/arm64, linux/386, linux/mips64le, linux/ppc64le, linux/s390x
           context: "{{ defaultContext }}:stable/debian-perl"
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
