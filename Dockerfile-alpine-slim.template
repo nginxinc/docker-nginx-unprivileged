@@ -7,8 +7,8 @@ ENV NGINX_VERSION=%%NGINX_VERSION%%
 ENV PKG_RELEASE=%%PKG_RELEASE%%
 ENV DYNPKG_RELEASE=%%DYNPKG_RELEASE%%
 
-ARG UID=101
-ARG GID=101
+ARG UID=1000
+ARG GID=1000
 
 RUN set -x \
 # create nginx user/group first, to be consistent throughout docker variants

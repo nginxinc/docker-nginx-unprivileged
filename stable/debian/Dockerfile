@@ -14,8 +14,8 @@ ENV NJS_RELEASE=1~bookworm
 ENV PKG_RELEASE=1~bookworm
 ENV DYNPKG_RELEASE=2~bookworm
 
-ARG UID=101
-ARG GID=101
+ARG UID=1000
+ARG GID=1000
 
 RUN set -x \
 # create nginx user/group first, to be consistent throughout docker variants

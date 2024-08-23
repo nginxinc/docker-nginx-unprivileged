@@ -6,8 +6,8 @@
 ARG IMAGE=nginxinc/nginx-unprivileged:1.26.2-alpine
 FROM $IMAGE
 
-ARG UID=101
-ARG GID=101
+ARG UID=1000
+ARG GID=1000
 
 USER root
 

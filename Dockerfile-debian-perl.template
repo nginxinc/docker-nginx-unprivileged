@@ -1,8 +1,8 @@
 ARG IMAGE=nginxinc/nginx-unprivileged:%%NGINX_VERSION%%
 FROM $IMAGE
 
-ARG UID=101
-ARG GID=101
+ARG UID=1000
+ARG GID=1000
 
 USER root
 
