@@ -64,12 +64,12 @@ RUN set -x; \
                 && tar xzvf ${REVISION}.tar.gz \
                 && cd pkg-oss-${REVISION} \
                 && cd debian \
-                && for target in nginx-module-perl=${NGINX_VERSION}-${DYNPKG_RELEASE}; do \
+                && for target in module-perl; do \
                     make rules-$target; \
                     mk-build-deps --install --tool="apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes" \
                         debuild-$target/nginx-$NGINX_VERSION/debian/control; \
                 done \
-                && make nginx-module-perl=${NGINX_VERSION}-${DYNPKG_RELEASE} \
+                && make module-perl \
             ) \
 # we don't remove APT lists here because they get re-downloaded and removed later
             \
