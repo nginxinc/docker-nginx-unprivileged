@@ -54,8 +54,8 @@ declare -A alpine=(
 )
 
 # When we bump njs version in a stable release we don't move the tag in the
-# mercurial repo.  This setting allows us to specify a revision to check out
-# when building alpine packages on architectures not supported by nginx.org
+# pkg-oss repo.  This setting allows us to specify a revision to check out
+# when building packages on architectures not supported by nginx.org
 # Remember to update pkgosschecksum when changing this.
 declare -A rev=(
     [mainline]='${NGINX_VERSION}-${PKG_RELEASE}'
@@ -64,10 +64,10 @@ declare -A rev=(
 
 # Holds SHA512 checksum for the pkg-oss tarball produced by source code
 # revision/tag in the previous block
-# Used in alpine builds for architectures not packaged by nginx.org
+# Used in builds for architectures not packaged by nginx.org
 declare -A pkgosschecksum=(
-    [mainline]='b9fbdf1779186fc02aa59dd87597fe4e906892391614289a4e6eedba398a3e770347b5b07110cca8c11fa3ba85bb711626ae69832e74c69ca8340d040a465907'
-    [stable]='825f610c44dfb97166112e6d060c0ba209a74f50e42c7c23a5b8742f468596f110bb1b4ca9299547a8a3d41f3a7caa864622f40f6c7bb4d8bab3d24880bdfb6a'
+    [mainline]='e1a8e980d904df21484fc09793f1c938d566dcf0e752171714e70fc364dcd54b1bf3ce3e2ec90747114c5b24ac8050f1e8c6a774ff4476508d5dc99666e59443'
+    [stable]='b5d8ad59567a5df18f134236c4e22a339229cd56f4b2ae8d1b77a17f3dcfb16672103bd9191d419acf93c90e866b59417aad26ad7710d9dcc53bf38d1f88d764'
 )
 
 get_packages() {
