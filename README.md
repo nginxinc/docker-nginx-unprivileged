@@ -32,6 +32,12 @@ Most images are built for the `amd64`, `arm32v5` (for Debian), `arm32v6` (for Al
 
 ## Troubleshooting Tips
 
+* If you wish to use a different user ID and/or group ID when running the Docker Unprivileged image, rebuild the image using the following Docker build arguments:
+
+  ```bash
+  docker build --build-arg UID=<UID> --build-arg GID=<GID> -t nginx-unprivileged .
+  ```
+
 * If you override the default `nginx.conf` file you may encounter various types of error messages:
   * To fix `nginx: [emerg] open() "/var/run/nginx.pid" failed (13: Permission denied)`, you have to specify a valid `pid` location by adding the line `pid /tmp/nginx.pid;` at the top level of your config.
   * To fix `nginx: [emerg] mkdir() "/var/cache/nginx/client_temp" failed (30: Read-only file system)`, you have to specify a valid location for the various NGINX temporary paths by adding these lines within the `http` context:
