@@ -8,7 +8,7 @@ on:
 jobs:
   version:
     name: Fetch NGINX mainline version
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       major: ${{ steps.nginx_version.outputs.major }}
       minor: ${{ steps.nginx_version.outputs.minor }}
@@ -33,7 +33,7 @@ jobs:
   slim:
     name: Build Alpine NGINX mainline slim Docker image
     needs: version
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
     steps:
@@ -151,7 +151,7 @@ jobs:
   core:
     name: Build Alpine NGINX mainline Docker image
     needs: [version, slim]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
     steps:
@@ -269,7 +269,7 @@ jobs:
   perl:
     name: Build Alpine NGINX mainline perl Docker image
     needs: [version, core]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
     steps:
