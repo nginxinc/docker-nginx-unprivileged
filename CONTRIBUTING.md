@@ -6,7 +6,7 @@ The following is a set of guidelines for contributing to the Docker Unprivileged
 
 [Ask a Question](#ask-a-question)
 
-[Getting Started](#project-overview)
+[Project Overview](#project-overview)
 
 [Contributing](#contributing)
 
