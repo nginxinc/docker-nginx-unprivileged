@@ -6,7 +6,7 @@ The following is a set of guidelines for contributing to the Docker Unprivileged
 
 [Ask a Question](#ask-a-question)
 
-[Getting Started](#getting-started)
+[Getting Started](#project-overview)
 
 [Contributing](#contributing)
 
@@ -34,7 +34,7 @@ To report a bug, open an issue on GitHub with the label `bug` using the availabl
 
 ### Report a Security vulnerability
 
-To report a security vulnerability, open an issue on GitHub with the label `security` using the available security report issue template. Please ensure the security vulnerability directly impacts one of the NGINX dependencies listed in the [`SECURITY`](https://github.com/nginxinc/docker-nginx-unprivileged/blob/main/.github/SECURITY.md) doc. Other security vulnerabilities should be addressed by the weekly Monday night build and as such will be promptly closed.
+To report a security vulnerability, open an issue on GitHub with the label `security` using the available security report issue template. Please ensure the security vulnerability directly impacts one of the NGINX dependencies listed in the [`SECURITY`](https://github.com/nginxinc/docker-nginx-unprivileged/blob/main/SECURITY.md) doc. Other security vulnerabilities should be addressed by the weekly Monday night build and as such will be promptly closed.
 
 ### Suggest a Feature or Enhancement
 
