@@ -242,7 +242,7 @@ jobs:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: index
 
       - name: Create manifest list and push
-        working-directory: /tmp/digests
+        working-directory: /tmp/images
         run: |
           set -x
           annotations=$(jq -cr '.annotations | map((split("=")[0] + "=\"" + split("=")[1] + "\"") | "--annotation " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
