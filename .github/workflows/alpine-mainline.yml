@@ -108,6 +108,11 @@ jobs:
         # env:
         #   DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
 
+      - name: Prepare env
+        run: |
+          platform=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+
       - name: Build and push NGINX mainline slim Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
         uses: docker/build-push-action@b32b51a8eda65d6793cd0494a773d4f6bcef32dc # v6.11.0
@@ -118,7 +123,7 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
           # outputs: type=image,"name=ghcr.io/nginxinc/nginx-unprivileged,docker.io/nginxinc/nginx-unprivileged",push-by-digest=true,name-canonical=true,push=true
           # outputs: type=image,"name=ghcr.io/nginxinc/nginx-unprivileged,docker.io/nginxinc/nginx-unprivileged",push-by-digest=true,name-canonical=true,push=true
-          outputs: type=docker,dest=${{ runner.temp }}/alpine-slim-${{ matrix.platform }}.tar
+          outputs: type=docker,dest=${{ runner.temp }}/alpine-slim-${{ env.PLATFORM_PAIR }}.tar
           # tags: ${{ steps.meta.outputs.tags }}
           # push: false
           # push: ${{ github.event_name != 'pull_request' }}
@@ -128,10 +133,11 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
-          name: alpine-slim-${{ matrix.platform }}
-          path: ${{ runner.temp }}/alpine-slim-${{ matrix.platform }}.tar
+          name: alpine-slim-${{ env.PLATFORM_PAIR }}
+          path: ${{ runner.temp }}/alpine-slim-${{ env.PLATFORM_PAIR }}.tar
           if-no-files-found: error
           retention-days: 1
+
       # - name: Save image as tarball
       #   run: |
       #     mkdir -p ${{ runner.temp }}/images
@@ -161,10 +167,7 @@ jobs:
       #     digest="${{ steps.build.outputs.digest }}"
       #     touch "${{ runner.temp }}/digests/${digest#sha256:}"
 
-      # - name: Prepare env
-      #   run: |
-      #     platform=${{ matrix.platform }}
-      #     echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+
 
       # - name: Upload digest
       #   uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
