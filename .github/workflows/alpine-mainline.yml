@@ -184,8 +184,8 @@ jobs:
       - name: Download image tarballs
         uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
-          name: alpine-slim-*
           path: /tmp/images
+          pattern: alpine-slim-*
           merge-multiple: true
 
       # - name: Download digests
@@ -252,7 +252,7 @@ jobs:
       - name: Inspect image
         run: |
           docker buildx imagetools inspect ghcr.io/nginxinc/nginx-unprivileged:alpine-slim-test
-          docker buildx imagetools inspect docker.io/nginxinc/nginx-unprivileged:alpine-slim-test
+          # docker buildx imagetools inspect docker.io/nginxinc/nginx-unprivileged:alpine-slim-test
 
       # - name: Sign Docker Hub Manifest
       #   if: ${{ github.event_name != 'pull_request' }}
