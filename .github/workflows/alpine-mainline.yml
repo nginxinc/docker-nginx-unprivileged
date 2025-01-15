@@ -247,7 +247,8 @@ jobs:
           set -x
           annotations=$(jq -cr '.annotations | map((split("=")[0] + "=\"" + split("=")[1] + "\"") | "--annotation " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
           tags=$(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
-          eval "docker buildx imagetools create $annotations $tags $(for tar in /tmp/images/*.tar; do echo 'ghcr.io/nginxinc/nginx-unprivileged:temp-${tar##*/}'; done)"
+          images=$(for tar in /tmp/images/*.tar; do echo "ghcr.io/nginxinc/nginx-unprivileged:temp-${tar##*/}"; done)
+          eval "docker buildx imagetools create $annotations $tags $images"
 
       - name: Inspect image
         run: |
