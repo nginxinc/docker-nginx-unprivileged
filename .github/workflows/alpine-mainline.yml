@@ -108,7 +108,7 @@ jobs:
 
       - name: Build and push NGINX mainline slim Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
-        uses: docker/build-push-action@b32b51a8eda65d6793cd0494a773d4f6bcef32dc # v6.11.0
+        uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6.13.0
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/riscv64, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-slim"
@@ -226,7 +226,7 @@ jobs:
 
       - name: Build and push NGINX mainline Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
-        uses: docker/build-push-action@b32b51a8eda65d6793cd0494a773d4f6bcef32dc # v6.11.0
+        uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6.13.0
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/riscv64, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine"
@@ -344,7 +344,7 @@ jobs:
 
       - name: Build and push NGINX mainline perl Alpine image to Amazon ECR Public Gallery, Docker Hub, GitHub Container Registry, and Quay
         id: build
-        uses: docker/build-push-action@b32b51a8eda65d6793cd0494a773d4f6bcef32dc # v6.11.0
+        uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6.13.0
         with:
           platforms: linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/386, linux/ppc64le, linux/riscv64, linux/s390x
           context: "{{ defaultContext }}:mainline/alpine-perl"
