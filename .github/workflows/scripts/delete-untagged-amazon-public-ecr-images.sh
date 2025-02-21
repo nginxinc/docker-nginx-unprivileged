@@ -24,7 +24,7 @@ function batch_delete {
 # otherwise any referenced untagged images can not be deleted.
 IMAGE_DIGESTS=$(aws ecr-public describe-images \
   --repository-name "${REPOSITORY_NAME}" \
-  --query 'imageDetails[?!imageTags && (contains(imageManifestMediaType, `manifest.list.v2`) || contains(imageManifestMediaType, `image.index.v1`)) && `date -d @{imagePushedAt} +%s` < '"${STORAGE_TIME}"'].{imageDigest: join(`=`, [`imageDigest`, imageDigest])}' \
+  --query 'imageDetails[?!imageTags && (contains(imageManifestMediaType, `manifest.list.v2`) || contains(imageManifestMediaType, `image.index.v1`)) && `date -d @{imagePushedAt} +%s` < `date -d '2 years ago' +%s`].{imageDigest: join(`=`, [`imageDigest`, imageDigest])}' \
   --output text)
 
 batch_delete "${IMAGE_DIGESTS}"
@@ -32,7 +32,7 @@ batch_delete "${IMAGE_DIGESTS}"
 # Find untagged images and delete them.
 IMAGE_DIGESTS=$(aws ecr-public describe-images \
   --repository-name "${REPOSITORY_NAME}" \
-  --query 'imageDetails[?!imageTags && `date -d @{imagePushedAt} +%s` < '"${STORAGE_TIME}"'].{imageDigest: join(`=`, [`imageDigest`, imageDigest])}' \
+  --query 'imageDetails[?!imageTags && `date -d @{imagePushedAt} +%s` < `date -d '2 years ago' +%s`].{imageDigest: join(`=`, [`imageDigest`, imageDigest])}' \
   --output text)
 
 batch_delete "${IMAGE_DIGESTS}"
