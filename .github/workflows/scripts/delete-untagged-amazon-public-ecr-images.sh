@@ -36,5 +36,3 @@ IMAGE_DIGESTS=$(aws ecr-public describe-images \
   --output text)
 
 batch_delete "${IMAGE_DIGESTS}"
-
-    --query 'Images[?CreationDate<`2019-06-18`]'
