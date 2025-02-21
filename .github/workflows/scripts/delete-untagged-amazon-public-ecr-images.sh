@@ -32,7 +32,7 @@ batch_delete "${IMAGE_DIGESTS}"
 # Find untagged images and delete them.
 IMAGE_DIGESTS=$(aws ecr-public describe-images \
   --repository-name "${REPOSITORY_NAME}" \
-  --query 'imageDetails[?!imageTags ** imagePushedAt < `2019-06-18` ].{imageDigest: join(`=`, [`imageDigest`, imageDigest])}' \
+  --query 'imageDetails[?!imageTags && imagePushedAt < `2019-06-18` ].{imageDigest: join(`=`, [`imageDigest`, imageDigest])}' \
   --output text)
 
 batch_delete "${IMAGE_DIGESTS}"
