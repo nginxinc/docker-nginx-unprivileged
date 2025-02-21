@@ -6,8 +6,8 @@ set -eu
 
 REPOSITORY_NAME=nginx-unprivileged
 BATCH_DELETE_SIZE=100 # The max delete size allowed by the 'batch-delete-image' AWS CLI command is 100
-CUTOFF_DATE="2019-06-18"
-# CUTOFF_DATE=$(date -d '2 years ago' +%s)
+# CUTOFF_DATE="2019-06-18"
+CUTOFF_DATE=$(date -d '2 years ago' +%Y-%m-%d)
 
 function batch_delete {
   while read -r batch; do
