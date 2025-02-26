@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 shopt -s nullglob
 
-cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
+cd "$(dirname "$(greadlink -f "$BASH_SOURCE")")"
 
 declare branches=(
     "stable"
@@ -12,14 +12,14 @@ declare branches=(
 # Current nginx versions
 # Remember to update pkgosschecksum when changing this.
 declare -A nginx=(
-    [mainline]='1.27.3'
-    [stable]='1.26.2'
+    [mainline]='1.27.4'
+    [stable]='1.26.3'
 )
 
 # Current njs versions
 declare -A njs=(
-    [mainline]='0.8.8'
-    [stable]='0.8.8'
+    [mainline]='0.8.9'
+    [stable]='0.8.9'
 )
 
 # Current njs patchlevel version
@@ -49,7 +49,7 @@ declare -A debian=(
 )
 
 declare -A alpine=(
-    [mainline]='3.20'
+    [mainline]='3.21'
     [stable]='3.20'
 )
 
@@ -58,16 +58,16 @@ declare -A alpine=(
 # when building packages on architectures not supported by nginx.org
 # Remember to update pkgosschecksum when changing this.
 declare -A rev=(
-    [mainline]='0286c5190d972a49bffc9bf247885dd510ce8181'
-    [stable]='f43e929dc7a6111ef5d9ecb281a75749f7934261'
+    [mainline]='${NGINX_VERSION}-${PKG_RELEASE}'
+    [stable]='${NGINX_VERSION}-${PKG_RELEASE}'
 )
 
 # Holds SHA512 checksum for the pkg-oss tarball produced by source code
 # revision/tag in the previous block
 # Used in builds for architectures not packaged by nginx.org
 declare -A pkgosschecksum=(
-    [mainline]='1e546bd15d7bc68e1772ecb6a73e29ba108ee5554a28928e57af038a9e8fc4f5cd35708ce89ad1dfaac97d870e663d32ef41045611d30b20d38b46816e3ab535'
-    [stable]='315e9e9040253396ebd9f540557e69cda7d9754a7895c3bf04fbf79d43be8d56e8efc6c22c21c87632039340080511179946456bbc4660e8faf171d130b475a6'
+    [mainline]='973690e64fa47e3704e817a3b08205b9e3f8c0cbe31825d9d62a81c11eb3aa186df015f27fdfd48c8799ffc528e38a9168c592ae665e4835c2d28638ec5f7845'
+    [stable]='3a4e869eded0c71e92f522e94edffea7fbfb5e78886ea7e484342fa2e028c62099a67d08860c249bf93776da97b924225e0d849dbb4697b298afe5421d7d6fea'
 )
 
 get_packages() {
@@ -210,7 +210,7 @@ for branch in "${branches[@]}"; do
         dynpkgver=$(get_packagever "$variant" "$branch" "dyn")
         buildtarget=$(get_buildtarget "$variant")
 
-        sed -i \
+        gsed -i \
             -e 's,%%ALPINE_VERSION%%,'"$alpinever"',' \
             -e 's,%%DEBIAN_VERSION%%,'"$debianver"',' \
             -e 's,%%DYNPKG_RELEASE%%,'"$dynpkgver"',' \
