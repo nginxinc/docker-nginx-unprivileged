@@ -1,0 +1,10 @@
+---
+annotations:
+  - checks:
+      - contributors
+      - fuzzing
+      - packaging
+      - sast
+      - signed-releases
+    reasons:
+      - reason: not-applicable
