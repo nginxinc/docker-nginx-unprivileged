@@ -1,29 +1,16 @@
 # Contributing Guidelines
 
-The following is a set of guidelines for contributing to the Docker Unprivileged NGINX image. We really appreciate that you are considering contributing!
+The following is a set of guidelines for contributing to the NGINX Docker unprivileged image. We really appreciate that you are considering contributing!
 
 #### Table Of Contents
 
 - [Getting Started](#getting-started)
 - [Contributing](#contributing)
 - [Code Guidelines](#code-guidelines)
-- [Docker NGINX Unprivileged Guidelines](#docker-nginx-unprivileged-guidelines)
-- [Git Guidelines](#git-guidelines)
-- [Code of Conduct](/CODE_OF_CONDUCT.md)
 
 ## Getting Started
 
-Follow the instructions on the README's [Getting Started](/README.md#Getting-Started) section to get this project up and running.
-
-<!-- ### Project Structure (OPTIONAL) -->
-## Ask a Question
-
-Don't know how something works? Curious if the role can achieve your desired functionality? Please open an Issue on GitHub with the label `question`.
-
-### Project Overview
-
-- The Docker Unprivileged NGINX repository is a mirror image of the [Docker NGINX image](https://github.com/nginxinc/docker-nginx). Changes have been made in order to support running NGINX in an unprivileged environment.
-- New Docker Unprivileged NGINX images are built on a weekly basis using GitHub actions.
+Look at the upstream Docker image [how to use this image guide](https://hub.docker.com/_/nginx/) to get the NGINX Docker unprivileged image up and running.
 
 ## Contributing
 
@@ -39,6 +26,10 @@ To suggest a feature or enhancement, please create an issue on GitHub with the l
 
 - Fork the repo, create a branch, implement your changes, test that the corresponding Docker images can be built and run as intended, and submit a PR when your changes are **tested** and ready for review.
 - Fill in the [PR template](/.github/pull_request_template.md).
+- This repository is a mirror image of the upstream [NGINX Docker image](https://github.com/nginxinc/docker-nginx) with minor changes in order to support running NGINX in an unprivileged environment. As such only two types of PRs will be considered:
+
+  1. PRs that incorporate changes made to the upstream image that have not yet been ported to this image (e.g. there's a new NGINX release).
+  2. PRs that add a critical feature or a nice-to-have enhancement for running these images on an unprivileged environment (e.g. allowing users specify to the UID/GID of the image user).
 
 **Note:** If you'd like to implement a new feature, please consider creating a [feature request issue](/.github/ISSUE_TEMPLATE/feature_request.yml) first to start a discussion about the feature.
 
@@ -50,12 +41,11 @@ If you have not yet agreed to the F5 CLA terms and submit a PR to this repositor
 
 ## Code Guidelines
 
-### Docker NGINX Unprivileged Guidelines
+### Docker Guidelines
 
-Given this repository is a mirror image of the upstream [Docker NGINX image](https://github.com/nginxinc/docker-nginx), only two types of PRs will be considered:
-
-1. PRs that incorporate changes made to upstream images (e.g. there's a new NGINX release).
-2. PRs that add a critical feature or a nice-to-have enhancement for running these images on an unprivileged environment (e.g. allowing users specify to the UID/GID of the image user).
+- Update any entrypoint scripts via the the scripts contained in the [`/entrypoint`](/entrypoint) directory.
+- Update any Dockerfiles via the Dockerfile templates in the root directory (e.g. [`Dockerfile-alpine.template`](/Dockerfile-alpine.template)).
+- Run the [`./update.sh`](/update.sh) script to apply all entrypoint/Dockerfile template changes to the relevant image entrypoints & Dockerfiles.
 
 ### Git Guidelines
 

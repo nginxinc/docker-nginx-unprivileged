@@ -26,12 +26,12 @@ Want to get in touch with the NGINX development team directly? Try using the rel
 
 ## Contributing
 
-Please see the [contributing guide](https://github.com/nginxinc/docker-nginx-unprivileged/blob/main/CONTRIBUTING.md) for guidelines on how to best contribute to this project.
+Please see the [contributing guide](/CONTRIBUTING.md) for guidelines on how to best contribute to this project.
 
 ## Commercial Support
 
-Commercial support for this project may be available. Please get in touch with [NGINX sales](https://www.nginx.com/contact-sales/) or check your contract details for more info!
+Commercial support for this project may be available. Please get in touch with [NGINX sales](https://www.f5.com/products/get-f5/) or check your contract details for more info!
 
 ## Community Support
 
-This project does **not** offer commercial support. Community support is offered on a best effort basis through either GitHub issues/PRs/discussions or through any of our active communities.
+Community support is offered on a best effort basis through either GitHub issues/PRs/discussions or through any of our active communities.

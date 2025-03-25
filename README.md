@@ -1,4 +1,4 @@
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/nginx/template-repository/badge)](https://securityscorecards.dev/viewer/?uri=github.com/nginx/template-repository)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/nginx/docker-nginx-unprivileged/badge)](https://securityscorecards.dev/viewer/?uri=github.com/nginx/docker-nginx-unprivileged)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Community Support](https://badgen.net/badge/support/community/cyan?icon=awesome)](/SUPPORT.md)
 [![Community Forum](https://img.shields.io/badge/community-forum-009639?logo=discourse&link=https%3A%2F%2Fcommunity.nginx.org)](https://community.nginx.org)
@@ -56,7 +56,7 @@ Most images are built for the `amd64`, `arm32v5` (for Debian), `arm32v6` (for Al
     }
     ```
 
-## On Reporting Issues
+## On Reporting Issues and Opening PRs
 
 Whilst issues and PRs are welcome, please do note that:
 
@@ -72,4 +72,4 @@ Please see the [contributing guide](/CONTRIBUTING.md) for guidelines on how to b
 
 [Apache License, Version 2.0](/LICENSE)
 
-&copy; [F5, Inc.](https://www.f5.com/) 2018-2025
+&copy; [F5, Inc.](https://www.f5.com/) 2018 - 2025

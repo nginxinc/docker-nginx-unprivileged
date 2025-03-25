@@ -22,7 +22,7 @@ body:
     attributes:
       label: Feature Overview
       description: A clear and concise description of what the feature request is.
-      placeholder: I would like this project to be able to do "X".
+      placeholder: I would like the NGINX Docker unprivileged image to be able to do "X".
     validations:
       required: true
 
@@ -31,7 +31,7 @@ body:
     attributes:
       label: Alternatives Considered
       description: Detail any potential alternative solutions/workarounds you've used or considered.
-      placeholder: I have done/might be able to do "X" in this project by doing "Y".
+      placeholder: I have done/might be able to do "X" using the NGINX Docker unprivileged image by doing "Y".
 
   - type: textarea
     id: context
