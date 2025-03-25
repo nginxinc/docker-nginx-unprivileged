@@ -27,16 +27,14 @@ jobs:
         run: |
           .github/workflows/scripts/delete-untagged-amazon-public-ecr-images.sh
 
-      # - name: Fetch multi-platform package version SHAs
-      #   id: multi-arch-digests
-      #   run: |
-      #     package=$(docker manifest inspect ghcr.io/nginxinc/nginx-unprivileged | jq -r '.manifests.[] | .digest' | paste -s -d ' ' -)
-
-      # - name: Delete untagged NGINX Unprivileged Docker images on the GitHub Container Registry
-      #   uses: snok/container-retention-policy@4f22ef80902ad409ed55a99dc5133cc1250a0d03 # v3.0.0
-      #   with:
-      #     account: nginxinc
-      #     image-names: nginx-unprivileged
-      #     tag-selection: untagged
-      #     cut-off: 2y
-      #     token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Delete untagged NGINX Unprivileged Docker images on the GitHub Container Registry
+        uses: dataaxiom/ghcr-cleanup-action@cd0cdb900b5dbf3a6f2cc869f0dbb0b8211f50c4 # v1.0.16
+        with:
+          package: nginx-unprivileged
+          delete-ghost-images: true
+          delete-untagged: true
+          delete-partial-images: true
+          delete-orphaned-images: true
+          older-than: 2 years
+          token: ${{ secrets.GITHUB_TOKEN }}
+          validate: true
