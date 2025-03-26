@@ -14,8 +14,6 @@ This repo contains a series of Dockerfiles to create an NGINX Docker image that 
 - The default NGINX PID has been moved from `/var/run/nginx.pid` to `/tmp/nginx.pid`
 - Change `*_temp_path` variables to `/tmp/*`
 
-New images are built and pushed to on a weekly basis (every Monday night).
-
 Check out the [docs](https://hub.docker.com/_/nginx) for the upstream Docker NGINX image for a detailed explanation on how to use this image.
 
 ## Supported Image Registries and Platforms
@@ -28,6 +26,16 @@ You can find pre-built images in each of the following registries:
 - Docker Hub - <https://hub.docker.com/r/nginxinc/nginx-unprivileged>
 - GitHub Container Registry - <https://github.com/nginxinc/docker-nginx-unprivileged/pkgs/container/nginx-unprivileged>
 - Quay - <https://quay.io/repository/nginx/nginx-unprivileged>
+
+### Image Builds and Retention Policy
+
+#### Image Builds
+
+New images are built whenever there is a new NGINX release or a critical CVE is found and fixed (check the [`security documentation`](/SECURITY.md) for more details). New images are also built and pushed to on a weekly basis (every Monday night). Whenever a new image is built, the current NGINX mainline and stable tags get switched to the latest build, and the image that gets replaced will become untagged. If you wish to point your builds to a specific image over time, use the specific image digest instead of the tag.
+
+#### Image Retention Policy
+
+Untagged images on Amazon ECR and the GitHub Container Registry are cleaned up on a two year basis. Untagged images on Docker Hub are not cleaned up at this time (this might change with the incoming storage changes). Untagged images on Quay are continuously removed due to its built in garbage collector. The last built tag of every release is kept indefinitely in every of the aforementioned registries.
 
 ### Architectures
 
@@ -60,7 +68,7 @@ Most images are built for the `amd64`, `arm32v5` (for Debian), `arm32v6` (for Al
 
 Whilst issues and PRs are welcome, please do note that:
 
-1. Issues related to security vulnerabilities will be promptly closed unless they are accompanied by a solid reasoning as to why the vulnerability poses a real security threat to this image. Check out the [`SECURITY`](https://github.com/nginxinc/docker-nginx-unprivileged/blob/main/SECURITY.md) doc for more details.
+1. Issues related to security vulnerabilities will be promptly closed unless they are accompanied by a solid reasoning as to why the vulnerability poses a real security threat to this image. Check out the [`security documentation`](/SECURITY.md) for more details.
 2. These images are unprivileged ports of the upstream [Docker NGINX](https://github.com/nginxinc/docker-nginx) images. Any changes that do not specifically involve the changes made to run NGINX on an unprivileged system should be reported in the [Docker NGINX](https://github.com/nginxinc/docker-nginx) upstream repo. They will not get addressed here.
 3. Following from 2., base images (e.g. Alpine x.x or Debian x) in the [Docker NGINX](https://github.com/nginxinc/docker-nginx) upstream repo get updated when a new version of NGINX is released, never within the same release version. Similarly, new NGINX releases usually make their way to the [Docker NGINX](https://github.com/nginxinc/docker-nginx) image a couple days after their standard release. Please refrain from opening an issue or PR here if the upstream repo hasn't been updated -- it will be closed.
 
