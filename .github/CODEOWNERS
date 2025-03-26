@@ -2,4 +2,4 @@
 # Main global owner #
 #####################
 
-*
+* @nginx/docker-unprivileged
