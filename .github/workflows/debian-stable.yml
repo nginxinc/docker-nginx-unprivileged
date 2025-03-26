@@ -89,7 +89,7 @@ jobs:
         with:
           images: |
             docker.io/nginxinc/nginx-unprivileged
-            ghcr.io/nginxinc/nginx-unprivileged
+            ghcr.io/nginx/nginx-unprivileged
             public.ecr.aws/nginx/nginx-unprivileged
             quay.io/nginx/nginx-unprivileged
           tags: |
@@ -200,7 +200,7 @@ jobs:
         with:
           images: |
             docker.io/nginxinc/nginx-unprivileged
-            ghcr.io/nginxinc/nginx-unprivileged
+            ghcr.io/nginx/nginx-unprivileged
             public.ecr.aws/nginx/nginx-unprivileged
             quay.io/nginx/nginx-unprivileged
           tags: |

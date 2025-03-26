@@ -7,7 +7,7 @@
 
 # NGINX Unprivileged Docker Image
 
-This repo contains a series of Dockerfiles to create an NGINX Docker image that runs NGINX as a non root, unprivileged user. Notable differences with respect to the official [NGINX Docker](https://github.com/nginxinc/docker-nginx) image include:
+This repo contains a series of Dockerfiles to create an NGINX Docker image that runs NGINX as a non root, unprivileged user. Notable differences with respect to the official [NGINX Docker](https://github.com/nginx/docker-nginx) image include:
 
 - The default NGINX listen port is now `8080` instead of `80` (this is no longer necessary as of Docker `20.03` but it's still required in other container runtimes)
 - The default NGINX user directive in `/etc/nginx/nginx.conf` has been removed
@@ -24,7 +24,7 @@ You can find pre-built images in each of the following registries:
 
 - Amazon ECR - <https://gallery.ecr.aws/nginx/nginx-unprivileged>
 - Docker Hub - <https://hub.docker.com/r/nginxinc/nginx-unprivileged>
-- GitHub Container Registry - <https://github.com/nginxinc/docker-nginx-unprivileged/pkgs/container/nginx-unprivileged>
+- GitHub Container Registry - <https://github.com/nginx/docker-nginx-unprivileged/pkgs/container/nginx-unprivileged>
 - Quay - <https://quay.io/repository/nginx/nginx-unprivileged>
 
 ### Image Builds and Retention Policy
@@ -69,8 +69,8 @@ Most images are built for the `amd64`, `arm32v5` (for Debian), `arm32v6` (for Al
 Whilst issues and PRs are welcome, please do note that:
 
 1. Issues related to security vulnerabilities will be promptly closed unless they are accompanied by a solid reasoning as to why the vulnerability poses a real security threat to this image. Check out the [`security documentation`](/SECURITY.md) for more details.
-2. These images are unprivileged ports of the upstream [Docker NGINX](https://github.com/nginxinc/docker-nginx) images. Any changes that do not specifically involve the changes made to run NGINX on an unprivileged system should be reported in the [Docker NGINX](https://github.com/nginxinc/docker-nginx) upstream repo. They will not get addressed here.
-3. Following from 2., base images (e.g. Alpine x.x or Debian x) in the [Docker NGINX](https://github.com/nginxinc/docker-nginx) upstream repo get updated when a new version of NGINX is released, never within the same release version. Similarly, new NGINX releases usually make their way to the [Docker NGINX](https://github.com/nginxinc/docker-nginx) image a couple days after their standard release. Please refrain from opening an issue or PR here if the upstream repo hasn't been updated -- it will be closed.
+2. These images are unprivileged ports of the upstream [Docker NGINX](https://github.com/nginx/docker-nginx) images. Any changes that do not specifically involve the changes made to run NGINX on an unprivileged system should be reported in the [Docker NGINX](https://github.com/nginx/docker-nginx) upstream repo. They will not get addressed here.
+3. Following from 2., base images (e.g. Alpine x.x or Debian x) in the [Docker NGINX](https://github.com/nginx/docker-nginx) upstream repo get updated when a new version of NGINX is released, never within the same release version. Similarly, new NGINX releases usually make their way to the [Docker NGINX](https://github.com/nginx/docker-nginx) image a couple days after their standard release. Please refrain from opening an issue or PR here if the upstream repo hasn't been updated -- it will be closed.
 
 ## Contributing
 

@@ -26,7 +26,7 @@ To suggest a feature or enhancement, please create an issue on GitHub with the l
 
 - Fork the repo, create a branch, implement your changes, test that the corresponding Docker images can be built and run as intended, and submit a PR when your changes are **tested** and ready for review.
 - Fill in the [PR template](/.github/pull_request_template.md).
-- This repository is a mirror image of the upstream [NGINX Docker image](https://github.com/nginxinc/docker-nginx) with minor changes in order to support running NGINX in an unprivileged environment. As such only two types of PRs will be considered:
+- This repository is a mirror image of the upstream [NGINX Docker image](https://github.com/nginx/docker-nginx) with minor changes in order to support running NGINX in an unprivileged environment. As such only two types of PRs will be considered:
 
   1. PRs that incorporate changes made to the upstream image that have not yet been ported to this image (e.g. there's a new NGINX release).
   2. PRs that add a critical feature or a nice-to-have enhancement for running these images on an unprivileged environment (e.g. allowing users specify to the UID/GID of the image user).
