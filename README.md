@@ -25,13 +25,14 @@ You can find pre-built images in each of the following registries:
 - Amazon ECR - <https://gallery.ecr.aws/nginx/nginx-unprivileged>
 - Docker Hub - <https://hub.docker.com/r/nginxinc/nginx-unprivileged>
 - GitHub Container Registry - <https://github.com/nginx/docker-nginx-unprivileged/pkgs/container/nginx-unprivileged>
+  - **Note**: For releases prior to NGINX 1.27.4 (mainline branch) and 1.26.3 (stable branch), use the old registry link <https://github.com/orgs/nginxinc/packages/container/package/nginx-unprivileged>
 - Quay - <https://quay.io/repository/nginx/nginx-unprivileged>
 
 ### Image Builds and Retention Policy
 
 #### Image Builds
 
-New images are built whenever there is a new NGINX release or a critical CVE is found and fixed (check the [`security documentation`](/SECURITY.md) for more details). New images are also built and pushed to on a weekly basis (every Monday night). Whenever a new image is built, the current NGINX mainline and stable tags get switched to the latest build, and the image that gets replaced will become untagged. If you wish to point your builds to a specific image over time, use the specific image digest instead of the tag.
+New images are built whenever there is a new NGINX release or a critical CVE is found and fixed (check the [security documentation](/SECURITY.md) for more details). New images are also built and pushed to all registries on a weekly basis every Monday night. Whenever a new image is built, the current NGINX mainline and stable tags get switched to the latest build, and the image that gets replaced will become untagged. If you wish to point your builds to a specific image over time, use the specific image digest instead of the tag.
 
 #### Image Retention Policy
 
